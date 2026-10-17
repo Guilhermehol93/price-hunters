@@ -20,6 +20,7 @@ from app.schemas.monitoring import (
 from app.services.ssrf_guard import validate_target_url, SSRFSecurityException
 from app.connectors import get_connector_for_url
 from app.workers.task_worker import check_monitored_product
+from app.api.security import require_api_access
 
 router = APIRouter(prefix="/monitoring", tags=["Monitoramento e Alertas"])
 
@@ -38,7 +39,7 @@ def get_current_user_id(db: Session) -> UUID:
     return default_admin.id
 
 
-@router.get("", response_model=list[MonitoredProductResponse])
+@router.get("", response_model=list[MonitoredProductResponse], dependencies=[Depends(require_api_access)])
 def list_monitored(db: Session = Depends(get_db)):
     repo = MonitoringRepository(db)
     user_id = get_current_user_id(db)
@@ -48,6 +49,7 @@ def list_monitored(db: Session = Depends(get_db)):
 @router.post("", response_model=MonitoredProductResponse, status_code=201)
 async def create_monitored_product(
     payload: MonitoredProductCreate,
+    _: None = Depends(require_api_access),
     db: Session = Depends(get_db)
 ):
     user_id = get_current_user_id(db)
@@ -152,7 +154,7 @@ async def create_monitored_product(
     return monitored
 
 
-@router.post("/{monitored_id}/check-now")
+@router.post("/{monitored_id}/check-now", dependencies=[Depends(require_api_access)])
 async def trigger_immediate_check(monitored_id: UUID, db: Session = Depends(get_db)):
     repo = MonitoringRepository(db)
     item = repo.get_by_id(monitored_id)
@@ -163,7 +165,7 @@ async def trigger_immediate_check(monitored_id: UUID, db: Session = Depends(get_
     return {"message": "Verificação concluída com sucesso"}
 
 
-@router.delete("/{monitored_id}", status_code=204)
+@router.delete("/{monitored_id}", status_code=204, dependencies=[Depends(require_api_access)])
 def delete_monitored(monitored_id: UUID, db: Session = Depends(get_db)):
     repo = MonitoringRepository(db)
     ok = repo.delete(monitored_id)

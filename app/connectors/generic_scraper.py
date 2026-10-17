@@ -33,7 +33,8 @@ class GenericScraper(BaseConnector):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            # Não seguir redirects automaticamente: o alvo não passou pelo SSRF guard.
+            async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
                 resp = await client.get(url, headers=headers)
                 if resp.status_code != 200:
                     return None

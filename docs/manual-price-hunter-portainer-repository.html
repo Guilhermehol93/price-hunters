@@ -1,0 +1,1425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual Completo de Instalação, Operação e Desenvolvimento — Price Hunter</title>
+    <style>
+        /* ==========================================================================
+           Price Hunter - Embedded Technical Manual Styles
+           Self-contained, responsive, dark/light compatible, print-optimized
+           ========================================================================== */
+        :root {
+            --bg-body: #0b0f19;
+            --bg-surface: #111827;
+            --bg-card: #1f2937;
+            --bg-code: #030712;
+            --border-color: #374151;
+            --border-accent: #3b82f6;
+            --text-main: #f9fafb;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-emerald: #10b981;
+            --accent-amber: #f59e0b;
+            --accent-rose: #f43f5e;
+            --accent-purple: #8b5cf6;
+            --font-sans: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
+            --sidebar-width: 320px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            font-size: 16px;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.65;
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar Navigation */
+        .manual-sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0;
+            bottom: 0;
+            left: 0;
+            overflow-y: auto;
+            padding: 28px 20px;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            margin-bottom: 24px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .sidebar-logo {
+            font-size: 26px;
+        }
+
+        .sidebar-title h2 {
+            font-size: 18px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+        }
+
+        .sidebar-subtitle {
+            font-size: 12px;
+            color: var(--accent-cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .toc-item a {
+            display: block;
+            padding: 8px 12px;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: 13px;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            line-height: 1.4;
+        }
+
+        .toc-item a:hover {
+            background-color: rgba(59, 130, 246, 0.12);
+            color: var(--text-main);
+            padding-left: 16px;
+        }
+
+        .toc-item a.active {
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            font-weight: 600;
+        }
+
+        /* Main Content */
+        .manual-container {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            max-width: 1100px;
+            padding: 48px 64px;
+        }
+
+        .hero-banner {
+            background: linear-gradient(135deg, rgba(30, 58, 138, 0.4) 0%, rgba(15, 23, 42, 0.9) 100%);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 48px;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+
+        .hero-badge {
+            display: inline-block;
+            background-color: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            border: 1px solid rgba(59, 130, 246, 0.4);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero-title {
+            font-size: 36px;
+            font-weight: 800;
+            letter-spacing: -1px;
+            margin-bottom: 12px;
+            background: linear-gradient(to right, #ffffff, #93c5fd);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .hero-description {
+            font-size: 16px;
+            color: #cbd5e1;
+            max-width: 800px;
+            line-height: 1.6;
+        }
+
+        .hero-meta {
+            margin-top: 24px;
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: var(--text-muted);
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            padding-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .hero-meta span strong {
+            color: var(--text-secondary);
+        }
+
+        /* Sections */
+        .manual-section {
+            margin-bottom: 64px;
+            padding-bottom: 40px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .section-header {
+            margin-bottom: 24px;
+        }
+
+        .section-tag {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: block;
+            margin-bottom: 6px;
+        }
+
+        h2 {
+            font-size: 28px;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 12px;
+        }
+
+        h3 {
+            font-size: 20px;
+            font-weight: 700;
+            color: #e2e8f0;
+            margin: 28px 0 14px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        h4 {
+            font-size: 16px;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin: 20px 0 10px 0;
+        }
+
+        p {
+            margin-bottom: 16px;
+            color: #cbd5e1;
+        }
+
+        ul, ol {
+            margin: 0 0 20px 24px;
+            color: #cbd5e1;
+        }
+
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin: 24px 0;
+            border-left: 4px solid;
+            line-height: 1.6;
+        }
+
+        .callout-title {
+            font-weight: 700;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .callout-info {
+            background-color: rgba(59, 130, 246, 0.08);
+            border-color: var(--accent-blue);
+            color: #bfdbfe;
+        }
+        .callout-info .callout-title { color: #60a5fa; }
+
+        .callout-warning {
+            background-color: rgba(245, 158, 11, 0.08);
+            border-color: var(--accent-amber);
+            color: #fde68a;
+        }
+        .callout-warning .callout-title { color: #fbbf24; }
+
+        .callout-danger {
+            background-color: rgba(244, 63, 94, 0.08);
+            border-color: var(--accent-rose);
+            color: #fecdd3;
+        }
+        .callout-danger .callout-title { color: #f87171; }
+
+        .callout-success {
+            background-color: rgba(16, 185, 129, 0.08);
+            border-color: var(--accent-emerald);
+            color: #a7f3d0;
+        }
+        .callout-success .callout-title { color: #34d399; }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--bg-code);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 18px 0 24px 0;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            line-height: 1.55;
+            color: #e2e8f0;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.5);
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 13px;
+            background-color: rgba(255, 255, 255, 0.08);
+            color: #38bdf8;
+            padding: 2px 6px;
+            border-radius: 4px;
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+        }
+
+        /* Tables */
+        .table-wrapper {
+            overflow-x: auto;
+            margin: 20px 0 28px 0;
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            background-color: var(--bg-surface);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            text-align: left;
+        }
+
+        th {
+            background-color: rgba(255, 255, 255, 0.03);
+            color: #94a3b8;
+            font-weight: 600;
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 18px;
+            border-bottom: 1px solid var(--border-color);
+            color: #e2e8f0;
+            vertical-align: top;
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-req { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+        .badge-opt { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
+        .badge-status-ok { background: rgba(16, 185, 129, 0.2); color: #34d399; }
+
+        /* Diagrams SVG Container */
+        .diagram-container {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 24px 0;
+            text-align: center;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+            overflow-x: auto;
+        }
+
+        .diagram-caption {
+            margin-top: 12px;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-style: italic;
+        }
+
+        /* Step Guide */
+        .step-container {
+            position: relative;
+            padding-left: 36px;
+            margin-bottom: 24px;
+        }
+
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 26px;
+            height: 26px;
+            background-color: var(--accent-blue);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: 700;
+        }
+
+        .step-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 6px;
+        }
+
+        /* Print styles */
+        @media print {
+            body {
+                background: #ffffff !important;
+                color: #000000 !important;
+            }
+            .manual-sidebar {
+                display: none !important;
+            }
+            .manual-container {
+                margin-left: 0 !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+            .hero-banner {
+                background: #f1f5f9 !important;
+                color: #000000 !important;
+                border: 1px solid #cbd5e1 !important;
+            }
+            .hero-title {
+                -webkit-text-fill-color: #000000 !important;
+                color: #000000 !important;
+            }
+            pre, code {
+                background: #f8fafc !important;
+                color: #0f172a !important;
+                border: 1px solid #e2e8f0 !important;
+            }
+            .callout {
+                background: #f8fafc !important;
+                border-left-width: 4px !important;
+            }
+            th, td {
+                color: #0f172a !important;
+                border-color: #e2e8f0 !important;
+            }
+            .manual-section {
+                page-break-after: always;
+            }
+        }
+
+        @media (max-width: 900px) {
+            .manual-sidebar {
+                display: none;
+            }
+            .manual-container {
+                margin-left: 0;
+                padding: 24px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Lateral Table of Contents -->
+    <aside class="manual-sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-brand">
+                <span class="sidebar-logo">🎯</span>
+                <div class="sidebar-title">
+                    <h2>Price Hunter</h2>
+                    <span class="sidebar-subtitle">Manual de Implantação via Repositório</span>
+                </div>
+            </div>
+        </div>
+
+        <ul class="toc-list">
+            <li class="toc-item"><a href="#sec-1">1. Apresentação</a></li>
+            <li class="toc-item"><a href="#sec-2">2. Arquitetura Técnica</a></li>
+            <li class="toc-item"><a href="#sec-3">3. Requisitos de Infraestrutura</a></li>
+            <li class="toc-item"><a href="#sec-4">4. Instalação pelo Portainer</a></li>
+            <li class="toc-item"><a href="#sec-5">5. Configuração do Supabase</a></li>
+            <li class="toc-item"><a href="#sec-6">6. Fontes de Preços & Conectores</a></li>
+            <li class="toc-item"><a href="#sec-7">7. Utilização da Interface Web</a></li>
+            <li class="toc-item"><a href="#sec-8">8. Inteligência & Scoring de Ofertas</a></li>
+            <li class="toc-item"><a href="#sec-9">9. Integração com Telegram Bot</a></li>
+            <li class="toc-item"><a href="#sec-10">10. Operação, Manutenção & Backup</a></li>
+            <li class="toc-item"><a href="#sec-11">11. Segurança, RLS & Hardening</a></li>
+            <li class="toc-item"><a href="#sec-12">12. Guia de Desenvolvimento</a></li>
+            <li class="toc-item"><a href="#sec-13">13. Limitações, Custos & Comparativo</a></li>
+            <li class="toc-item"><a href="#sec-14">14. Referência Técnica & FAQ</a></li>
+        </ul>
+    </aside>
+
+    <!-- Main Documentation Area -->
+    <main class="manual-container">
+
+        <!-- Hero Cover -->
+        <header class="hero-banner">
+            <span class="hero-badge">Manual de Engenharia e Operação • Versão 1.0.0</span>
+            <h1 class="hero-title">Price Hunter — Instalação pelo Repositório no Portainer</h1>
+            <p class="hero-description">
+                Versão do manual dedicada à implantação da Stack diretamente de um repositório Git no Portainer.
+            </p>
+            <div class="hero-meta">
+                <span><strong>Linguagem:</strong> Python 3.11+ / FastAPI / SQL</span>
+                <span><strong>Persistência:</strong> PostgreSQL 16 / Supabase</span>
+                <span><strong>Orquestração:</strong> Docker Compose / Portainer / Umbrel</span>
+                <span><strong>Última Revisão:</strong> Outubro de 2026</span>
+            </div>
+        </header>
+
+        <!-- SEÇÃO 1 -->
+        <section id="sec-1" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 01</span>
+                <h2>Apresentação do Projeto</h2>
+            </div>
+
+            <h3>1.1. Objetivo do Price Hunter</h3>
+            <p>
+                O <strong>Price Hunter</strong> é uma plataforma autônoma e autohospedada projetada para varrer, rastrear, analisar e alertar sobre variações reais de preços no comércio eletrônico brasileiro (como Mercado Livre, Amazon Brasil, KaBuM!, Zoom, Buscapé e lojas genéricas).
+            </p>
+            <p>
+                Diferente de agregadores comerciais que exibem falsos descontos ("metade do dobro"), o Price Hunter constrói uma linha de base histórica temporal (30, 60 e 90 dias) para cada anúncio e produto cadastrado, identificando fraudes promocionais e destacando exclusivamente oportunidades com real desvio estatístico.
+            </p>
+
+            <h3>1.2. Principais Funcionalidades</h3>
+            <ul>
+                <li><strong>Radar de Ofertas Inteligente:</strong> Algoritmo de <em>Opportunity Score</em> (0 a 100) que combina profundidade do desconto contra a média móvel de 30 dias, proximidade da mínima histórica (All-Time Low), reputação do lojista e densidade de amostragem.</li>
+                <li><strong>Cadastro Universal por URL:</strong> Permite cadastrar qualquer link de produto de e-commerce com blindagem rigorosa contra ataques de SSRF (Server-Side Request Forgery).</li>
+                <li><strong>Compatibilidade Dual com Supabase & PostgreSQL Local:</strong> Modelo relacional com suporte nativo a Supabase (via CLI, migrações versionadas, poolers de conexão e RLS) ou PostgreSQL local rodando em container Docker.</li>
+                <li><strong>Alertas Instantâneos no Telegram:</strong> Bot assíncrono que dispara cards ricos com foto, percentual real de desconto, badges e link de acesso rápido, respeitando janelas de cooldown para evitar spam.</li>
+                <li><strong>Coleta em Background Desacoplada:</strong> Workers autônomos com agendador de tarefas periódicas, tolerância a falhas e políticas de rate limiting.</li>
+                <li><strong>Interface Web Moderna e Responsiva:</strong> Dashboard completo com gráficos de histórico, gestão de monitoramentos, teste de conectores e verificação de integridade.</li>
+            </ul>
+
+            <h3>1.3. Fluxo de Ponta a Ponta: Da Coleta ao Alerta</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 900 240" width="100%" height="240" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="900" height="240" fill="#111827" rx="12"/>
+                    <!-- Step 1 -->
+                    <rect x="30" y="70" width="140" height="90" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="2"/>
+                    <text x="100" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">1. Entrada / Crawl</text>
+                    <text x="100" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">Busca ou URL</text>
+                    <text x="100" y="140" fill="#94a3b8" font-size="11" text-anchor="middle">Proteção SSRF</text>
+                    <!-- Arrow 1 -->
+                    <path d="M 170 115 L 205 115" stroke="#3b82f6" stroke-width="2" marker-end="url(#arrow)"/>
+
+                    <!-- Step 2 -->
+                    <rect x="210" y="70" width="140" height="90" rx="8" fill="#1e293b" stroke="#06b6d4" stroke-width="2"/>
+                    <text x="280" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">2. Conectores</text>
+                    <text x="280" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">API ML / Amazon</text>
+                    <text x="280" y="140" fill="#94a3b8" font-size="11" text-anchor="middle">JSON-LD / Scraper</text>
+                    <!-- Arrow 2 -->
+                    <path d="M 350 115 L 385 115" stroke="#06b6d4" stroke-width="2"/>
+
+                    <!-- Step 3 -->
+                    <rect x="390" y="70" width="150" height="90" rx="8" fill="#1e293b" stroke="#8b5cf6" stroke-width="2"/>
+                    <text x="465" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">3. Persistência SQL</text>
+                    <text x="465" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">Snapshots no histórico</text>
+                    <text x="465" y="140" fill="#94a3b8" font-size="11" text-anchor="middle">Supabase / Postgres</text>
+                    <!-- Arrow 3 -->
+                    <path d="M 540 115 L 575 115" stroke="#8b5cf6" stroke-width="2"/>
+
+                    <!-- Step 4 -->
+                    <rect x="580" y="70" width="140" height="90" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="2"/>
+                    <text x="650" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">4. Inteligência</text>
+                    <text x="650" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">Desvio 30/60/90d</text>
+                    <text x="650" y="140" fill="#94a3b8" font-size="11" text-anchor="middle">Score (0 a 100)</text>
+                    <!-- Arrow 4 -->
+                    <path d="M 720 115 L 755 115" stroke="#f59e0b" stroke-width="2"/>
+
+                    <!-- Step 5 -->
+                    <rect x="760" y="70" width="120" height="90" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="2"/>
+                    <text x="820" y="105" fill="#ffffff" font-size="13" font-weight="bold" text-anchor="middle">5. Alerta</text>
+                    <text x="820" y="125" fill="#94a3b8" font-size="11" text-anchor="middle">Radar Web</text>
+                    <text x="820" y="140" fill="#94a3b8" font-size="11" text-anchor="middle">Telegram Bot</text>
+                </svg>
+                <div class="diagram-caption">Figura 1.1 — Fluxo analítico de ponta a ponta implementado no Price Hunter.</div>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 2 -->
+        <section id="sec-2" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 02</span>
+                <h2>Arquitetura Técnica do Sistema</h2>
+            </div>
+
+            <h3>2.1. Tecnologias Utilizadas</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Camada</th>
+                            <th>Tecnologia / Pacote</th>
+                            <th>Papel e Justificativa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Backend API</strong></td>
+                            <td>Python 3.11+ / FastAPI</td>
+                            <td>Servidor assíncrono de alto desempenho, documentação automática OpenAPI/Swagger e tipagem estrita com Pydantic v2.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Persistência</strong></td>
+                            <td>SQLAlchemy 2.0 + psycopg3</td>
+                            <td>ORM com Repository Pattern, suporte a prepared statements desativados para poolers Supavisor/PgBouncer.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Banco de Dados</strong></td>
+                            <td>PostgreSQL 16 / Supabase</td>
+                            <td>Banco relacional ACID com tipos UUIDv4, JSONB, restrições numéricas e Row Level Security (RLS).</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Workers & Tarefas</strong></td>
+                            <td>APScheduler + Python Asyncio</td>
+                            <td>Execução periódica de verificações de monitoramento e scraping sem travar o event loop da API.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Fila / Cache</strong></td>
+                            <td>Redis 7.2 Alpine</td>
+                            <td>Cache em memória para deduplicação de alertas, rate-limiting e filas de mensagens.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Frontend</strong></td>
+                            <td>HTML5, CSS3 Moderno, Vanilla JS</td>
+                            <td>Interface autossuficiente servida pelo Nginx ou FastAPI, sem necessidade de build complexo no browser.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Notificações</strong></td>
+                            <td>Telegram Bot API (HTTPX)</td>
+                            <td>Disparo assíncrono com retentativas, persistência de entregas e formatação HTML rica.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>2.2. Diagrama Arquitetural de Componentes e Comunicação</h3>
+            <div class="diagram-container">
+                <svg viewBox="0 0 920 420" width="100%" height="420" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="920" height="420" fill="#0f172a" rx="12" stroke="#334155" stroke-width="1"/>
+                    
+                    <!-- Client Group -->
+                    <rect x="30" y="30" width="220" height="150" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
+                    <text x="140" y="55" fill="#38bdf8" font-size="14" font-weight="bold" text-anchor="middle">Camada do Usuário</text>
+                    <rect x="50" y="75" width="180" height="35" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="140" y="98" fill="#f8fafc" font-size="12" text-anchor="middle">Navegador Web (Porta 18080)</text>
+                    <rect x="50" y="120" width="180" height="35" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="140" y="143" fill="#f8fafc" font-size="12" text-anchor="middle">Telegram App (Mobile / Desktop)</text>
+
+                    <!-- Web / Proxy Container -->
+                    <rect x="310" y="30" width="240" height="150" rx="8" fill="#1e293b" stroke="#3b82f6" stroke-width="1.5"/>
+                    <text x="430" y="55" fill="#3b82f6" font-size="14" font-weight="bold" text-anchor="middle">Frontend (Nginx / Static)</text>
+                    <rect x="330" y="75" width="200" height="40" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="430" y="100" fill="#f8fafc" font-size="12" text-anchor="middle">Nginx Reverse Proxy (:80)</text>
+                    <text x="430" y="145" fill="#94a3b8" font-size="11" text-anchor="middle">Roteia /api/* para o Backend</text>
+
+                    <!-- Backend API Container -->
+                    <rect x="610" y="30" width="280" height="360" rx="8" fill="#1e293b" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="750" y="55" fill="#10b981" font-size="14" font-weight="bold" text-anchor="middle">Backend Core (FastAPI :8000)</text>
+                    
+                    <rect x="630" y="75" width="240" height="40" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="750" y="100" fill="#f8fafc" font-size="12" text-anchor="middle">REST API Endpoints & SSRF Guard</text>
+
+                    <rect x="630" y="130" width="240" height="40" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="750" y="155" fill="#f8fafc" font-size="12" text-anchor="middle">Motor de Inteligência de Preços</text>
+
+                    <rect x="630" y="185" width="240" height="40" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="750" y="210" fill="#f8fafc" font-size="12" text-anchor="middle">Repository Layer (Desacoplamento)</text>
+
+                    <rect x="630" y="240" width="240" height="40" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="750" y="265" fill="#f8fafc" font-size="12" text-anchor="middle">Task Worker & Periodic Scheduler</text>
+
+                    <rect x="630" y="295" width="240" height="70" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="750" y="320" fill="#f8fafc" font-size="12" text-anchor="middle">Conectores de E-commerce</text>
+                    <text x="750" y="345" fill="#94a3b8" font-size="11" text-anchor="middle">Mercado Livre • Amazon • Zoom • Generic</text>
+
+                    <!-- Persistence Group -->
+                    <rect x="30" y="230" width="520" height="160" rx="8" fill="#1e293b" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="290" y="255" fill="#f59e0b" font-size="14" font-weight="bold" text-anchor="middle">Camada de Persistência Dual (Configurável)</text>
+                    
+                    <rect x="50" y="275" width="220" height="95" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="160" y="300" fill="#60a5fa" font-size="12" font-weight="bold" text-anchor="middle">Opção A: PostgreSQL Local</text>
+                    <text x="160" y="320" fill="#94a3b8" font-size="11" text-anchor="middle">Docker Container (:5432)</text>
+                    <text x="160" y="340" fill="#94a3b8" font-size="11" text-anchor="middle">Volume: postgres_data</text>
+
+                    <rect x="300" y="275" width="230" height="95" rx="6" fill="#0f172a" stroke="#475569"/>
+                    <text x="415" y="300" fill="#34d399" font-size="12" font-weight="bold" text-anchor="middle">Opção B: Supabase Gerenciado</text>
+                    <text x="415" y="320" fill="#94a3b8" font-size="11" text-anchor="middle">Pooler :6543 (Transaction)</text>
+                    <text x="415" y="340" fill="#94a3b8" font-size="11" text-anchor="middle">Row Level Security (RLS) Nativo</text>
+                </svg>
+                <div class="diagram-caption">Figura 2.1 — Arquitetura de microsserviços, conectores e camada de persistência intercambiável.</div>
+            </div>
+
+            <h3>2.3. Estrutura de Diretórios do Projeto</h3>
+            <pre><code>d:\Aplicacao\Busca de promoção\
+├── .env.example                  # Template com todas as variáveis documentadas
+├── README.md                     # Visão geral rápida e direcionamento ao manual
+├── docker-compose.yml            # Compose principal unificado para Portainer
+├── docker-compose.local.yml      # Perfil de execução 100% local com Postgres Docker
+├── docker-compose.supabase.yml   # Perfil conectando diretamente ao Supabase externo
+├── Dockerfile.backend            # Build multi-stage da API FastAPI (non-root)
+├── Dockerfile.frontend           # Servidor Nginx Alpine com reverse proxy
+├── Dockerfile.worker             # Container do worker de crawling e monitoramento
+├── nginx.conf                    # Configuração do proxy reverso do frontend
+├── requirements.txt              # Dependências de produção fixadas
+├── requirements-dev.txt          # Dependências de testes e análise estática
+├── database/
+│   └── migrations/               # Migrações SQL universais versionadas (00001 a 00005)
+├── supabase/
+│   ├── config.toml               # Configuração padrão da CLI do Supabase
+│   ├── seed.sql                  # Dados de demonstração e lojas iniciais
+│   └── migrations/               # Migrações no padrão timestamp para a CLI Supabase
+├── scripts/
+│   ├── migrate.py                # Utilitário CLI para aplicar migrações e seeds
+│   ├── validate_db.py            # Validador de esquema, índices e RLS
+│   └── test_connection.py        # Diagnóstico de rede e poolers (5432/6543)
+├── app/
+│   ├── config.py                 # Pydantic Settings para carregamento de ambiente
+│   ├── database.py               # Configuração SQLAlchemy e pooler Supavisor
+│   ├── main.py                   # Ponto de entrada FastAPI, CORS e rotas
+│   ├── models/                   # 19 entidades ORM completas (Base, User, Listing, etc.)
+│   ├── schemas/                  # Validação de I/O com Pydantic v2
+│   ├── repositories/             # Camada de Repositório desacoplada
+│   ├── services/                 # Inteligência estatística, SSRF Guard e Telegram
+│   ├── connectors/               # Adaptadores para Mercado Livre, Amazon, Zoom e Genérico
+│   ├── workers/                  # Task worker e agendador APScheduler
+│   └── api/                      # Roteadores REST (/products, /radar, /monitoring, etc.)
+├── frontend/                     # Interface Web responsiva (HTML5, CSS3, JS)
+├── tests/                        # Bateria de testes unitários e de integração
+└── docs/
+    └── manual-price-hunter.html  # Este manual completo e autossuficiente</code></pre>
+        </section>
+
+        <!-- SEÇÃO 3 -->
+        <section id="sec-3" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 03</span>
+                <h2>Requisitos de Infraestrutura</h2>
+            </div>
+
+            <h3>3.1. Requisitos Mínimos de Sistema</h3>
+            <p>
+                O Price Hunter foi desenhado para operar com extrema eficiência de recursos, sendo ideal tanto para servidores dedicados na nuvem (VPS Hetzner, AWS, Oracle Cloud) quanto para servidores domésticos (mini PCs, Raspberry Pi 4/5 com 64-bit, servidores Umbrel ou NAS com suporte a Docker).
+            </p>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Recurso</th>
+                            <th>Requisito Mínimo (com Supabase externo)</th>
+                            <th>Requisito Recomendado (com Postgres Local)</th>
+                            <th>Premissas e Justificativa</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>CPU</strong></td>
+                            <td>1 núcleo (vCPU)</td>
+                            <td>2 núcleos (vCPU)</td>
+                            <td>Workers assíncronos não consomem CPU contínua; picos ocorrem durante parsing HTML.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Memória RAM</strong></td>
+                            <td>512 MB</td>
+                            <td>1.5 GB</td>
+                            <td>PostgreSQL local consome ~256MB em repouso. O backend FastAPI opera com ~120MB.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Armazenamento</strong></td>
+                            <td>5 GB SSD</td>
+                            <td>15 GB SSD</td>
+                            <td>Volume de histórico de preços: ~100 mil snapshots ocupam menos de 50MB no PostgreSQL com índices btree.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Sistema Operacional</strong></td>
+                            <td>Linux (Debian 11+, Ubuntu 22+, Alpine, Umbrel OS)</td>
+                            <td>Linux com Docker Engine 24+</td>
+                            <td>Compatível com qualquer distribuição POSIX que execute Docker Compose v2+.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Docker Engine</strong></td>
+                            <td>Versão 20.10+</td>
+                            <td>Versão 24.0+ ou superior</td>
+                            <td>Suporte a multi-stage builds e drivers de volume locais.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Portainer</strong></td>
+                            <td>Portainer CE 2.18+</td>
+                            <td>Portainer CE 2.20+ ou Business</td>
+                            <td>Suporte ao recurso "Stacks" com variáveis de ambiente em formulário.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>3.2. Mapeamento de Portas de Rede</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Porta Padrão</th>
+                            <th>Serviço</th>
+                            <th>Exposição Recomendada</th>
+                            <th>Variável de Ambiente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>18080/tcp</code></td>
+                            <td>Frontend Web (Nginx)</td>
+                            <td>Rede Local (LAN) ou Proxy Reverso HTTPS</td>
+                            <td><code>WEB_PORT</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>8000/tcp</code></td>
+                            <td>Backend API (FastAPI)</td>
+                            <td>Apenas rede interna Docker (opcional externa)</td>
+                            <td><code>API_PORT</code></td>
+                        </tr>
+                        <tr>
+                            <td><code>6379/tcp</code></td>
+                            <td>Redis Cache</td>
+                            <td><strong>NUNCA EXPOR PUBLICAMENTE</strong> (interna)</td>
+                            <td>Acesso apenas via rede Docker</td>
+                        </tr>
+                        <tr>
+                            <td><code>5432/tcp</code></td>
+                            <td>PostgreSQL Local</td>
+                            <td><strong>NUNCA EXPOR PUBLICAMENTE</strong> (interna)</td>
+                            <td>Acesso restrito ao container backend</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 4 -->
+        <section id="sec-4" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 04</span>
+                <h2>Instalação pelo Repositório no Portainer</h2>
+            </div>
+
+            <p>Este roteiro cria a Stack diretamente a partir do Git. O Portainer busca o arquivo Compose no repositório e pode reutilizar essa fonte nas atualizações. Antes de começar, publique o projeto em um repositório Git acessível pelo servidor Portainer. Para repositórios privados, configure as credenciais de acesso no Portainer.</p>
+
+            <div class="step-container">
+                <div class="step-number">1</div>
+                <div class="step-title">Preparar o servidor</div>
+                <p>Confirme que o ambiente selecionado no Portainer tem Docker Engine e suporte a Docker Compose (Stack). O host precisa conseguir acessar o endereço Git e baixar as imagens base necessárias ao build.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">2</div>
+                <div class="step-title">Abrir a criação de Stack</div>
+                <p>No Portainer, selecione o ambiente Docker, abra <strong>Stacks</strong> e clique em <strong>+ Add stack</strong>.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">3</div>
+                <div class="step-title">Escolher a implantação via repositório</div>
+                <p>Informe <code>price-hunter</code> no campo <strong>Name</strong> e selecione <strong>Repository</strong> como método de implantação.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">4</div>
+                <div class="step-title">Informar o repositório Git</div>
+                <p>Preencha <strong>Repository URL</strong> com a URL clonável do projeto, por exemplo <code>https://github.com/USUARIO/REPOSITORIO.git</code>. Selecione a referência desejada, normalmente <code>refs/heads/main</code>. Para repositório privado, habilite a autenticação e informe um token ou credencial de leitura.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">5</div>
+                <div class="step-title">Selecionar o arquivo Compose</div>
+                <p>Em <strong>Compose path</strong>, informe <code>docker-compose.yml</code> para usar PostgreSQL local. Para Supabase gerenciado, use <code>docker-compose.supabase.yml</code>. O caminho é relativo à raiz do repositório.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">6</div>
+                <div class="step-title">Configurar variáveis de ambiente</div>
+                <p>Na seção <strong>Environment variables</strong>, use <strong>Advanced mode</strong> para cadastrar as variáveis necessárias. Comece pelo modelo <code>.env.example</code> do repositório e substitua todos os valores de exemplo por credenciais fortes e valores reais:</p>
+                <pre><code>ENVIRONMENT=production
+WEB_PORT=18080
+API_PORT=8000
+DATABASE_URL=postgresql+psycopg://postgres:SENHA_FORTE@postgres:5432/pricehunter
+POSTGRES_DB=pricehunter
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=SENHA_FORTE
+DB_POOL_MODE=direct
+REDIS_PASSWORD=OUTRA_SENHA_FORTE
+TELEGRAM_BOT_TOKEN=TOKEN_DO_SEU_BOT
+TELEGRAM_DEFAULT_CHAT_ID=SEU_CHAT_ID</code></pre>
+                <p>Use as variáveis necessárias ao Compose selecionado. Não publique senhas, tokens ou chaves reais no repositório Git.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">7</div>
+                <div class="step-title">Ajustar o banco Supabase (se aplicável)</div>
+                <p>Para <code>docker-compose.supabase.yml</code>, configure <code>DATABASE_URL</code> com a URL de conexão do seu projeto Supabase. Com o pooler em modo transaction, use a porta e o modo indicados pelo painel Supabase e defina <code>DB_POOL_MODE=transaction</code>. Não configure PostgreSQL local se o Compose escolhido não o utilizar.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">8</div>
+                <div class="step-title">Implantar a Stack</div>
+                <p>Revise o repositório, a referência Git, o caminho Compose e as variáveis. Clique em <strong>Deploy the stack</strong>. O Portainer clonará o repositório e construirá as imagens definidas no Compose.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">9</div>
+                <div class="step-title">Conferir os containers</div>
+                <p>Abra a Stack e verifique os logs e o estado dos serviços. Aguarde os healthchecks do frontend, backend e Redis; no perfil local, confira também o PostgreSQL e o worker.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">10</div>
+                <div class="step-title">Acessar a interface</div>
+                <p>Abra <code>http://IP_DO_SERVIDOR:18080</code>. Se a porta estiver ocupada, altere <code>WEB_PORT</code> nas variáveis da Stack e atualize a Stack.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">11</div>
+                <div class="step-title">Atualizar pela origem Git</div>
+                <p>Quando houver uma nova versão, atualize a referência no repositório escolhido e use <strong>Pull and redeploy</strong> ou <strong>Update the stack</strong> com a opção de buscar novamente o repositório, conforme a versão do Portainer. Se habilitar atualização automática, configure o polling ou webhook disponível no Portainer.</p>
+            </div>
+
+            <div class="step-container">
+                <div class="step-number">12</div>
+                <div class="step-title">Diagnosticar falhas</div>
+                <p>Se a Stack falhar, verifique os logs de implantação, a URL e referência Git, o caminho do Compose, as credenciais do repositório e se todas as variáveis obrigatórias estão definidas. Em conflito de porta, escolha uma porta livre em <code>WEB_PORT</code>. Para erros de banco, confirme host, porta e credenciais de <code>DATABASE_URL</code>.</p>
+            </div>
+        </section>
+        <!-- SEÇÃO 5 -->
+        <section id="sec-5" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 05</span>
+                <h2>Configuração Detalhada com Supabase</h2>
+            </div>
+
+            <p>
+                O Supabase fornece uma infraestrutura PostgreSQL gerenciada em nuvem com alta disponibilidade, backups automáticos diários e painel visual de administração. O Price Hunter é 100% compatível com a plataforma.
+            </p>
+
+            <h3>5.1. Obtenção das Credenciais no Painel do Supabase</h3>
+            <ol>
+                <li>Acesse o <a href="https://supabase.com/dashboard" target="_blank" style="color: var(--accent-cyan);">Dashboard do Supabase</a> e crie ou selecione seu projeto.</li>
+                <li>Navegue até <strong>Project Settings ➔ Database</strong>.</li>
+                <li>Na seção <strong>Connection parameters</strong>, localize o <strong>Connection Pooler</strong>.</li>
+                <li>Selecione o modo <strong>Transaction</strong> (Porta <strong>6543</strong>) ou <strong>Session</strong> (Porta <strong>5432</strong>).</li>
+                <li>Copie a URI de conexão (ex: <code>postgresql://postgres.[REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres</code>).</li>
+            </ol>
+
+            <div class="callout callout-info">
+                <div class="callout-title">ℹ️ Regra Crítica: Modo Transaction Pooler</div>
+                Quando utilizar o pooler do Supabase no modo <strong>Transaction</strong> (porta 6543), defina impreterivelmente no seu <code>.env</code>:
+                <br><code>DB_POOL_MODE=transaction</code>
+                <br>O Price Hunter desativará automaticamente os <em>server-side prepared statements</em> (<code>prepare_threshold=None</code>), prevenindo erros de protocolo do PgBouncer.
+            </div>
+
+            <h3>5.2. Aplicação de Migrações no Supabase</h3>
+            <p>Você pode aplicar o esquema de tabelas, índices e RLS de duas formas práticas e seguras:</p>
+
+            <h4>Método A: Utilizando a CLI do Migrador Price Hunter (Recomendado)</h4>
+            <pre><code>python scripts/migrate.py --db-url "postgresql://postgres.[REF]:[SENHA]@aws-0-sa-east-1.pooler.supabase.com:6543/postgres" --up --seed</code></pre>
+
+            <h4>Método B: Utilizando a Supabase CLI Oficial</h4>
+            <pre><code># Login e link com seu projeto remoto
+supabase login
+supabase link --project-ref xxxxxxxxxxxxxxxxxxxx
+
+# Aplicar todas as migrações da pasta supabase/migrations
+supabase db push</code></pre>
+
+            <h3>5.3. Modelo de Isolamento e Row Level Security (RLS)</h3>
+            <p>
+                Todas as tabelas do Price Hunter possuem RLS habilitado na migração <code>00003_rls_policies.sql</code>:
+            </p>
+            <ul>
+                <li><strong>Catálogo Público (Leitura Livre):</strong> Anúncios comerciais (<code>commercial_listings</code>), produtos (<code>products</code>), lojas (<code>stores</code>) e histórico de preços (<code>price_history</code>) possuem política de <code>SELECT</code> aberta para qualquer cliente autenticado ou anônimo.</li>
+                <li><strong>Dados Privados do Usuário:</strong> Monitoramentos (<code>monitored_products</code>), regras de alerta (<code>alert_rules</code>), preferências (<code>user_preferences</code>) e pesquisas salvas (<code>saved_searches</code>) utilizam a função <code>current_app_user_id()</code>, garantindo que nenhum usuário visualize itens de outro.</li>
+                <li><strong>Bypass do Backend (Service Role):</strong> O backend do Price Hunter e os workers executam com o papel administrativo <code>service_role</code> do Supabase, contornando o RLS para realizar coletas globais sem impedimentos.</li>
+            </ul>
+        </section>
+
+        <!-- SEÇÃO 6 -->
+        <section id="sec-6" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 06</span>
+                <h2>Configuração das Fontes de Preços & Conectores</h2>
+            </div>
+
+            <h3>6.1. Conectores Nativos Implementados</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Conector</th>
+                            <th>Identificador (Slug)</th>
+                            <th>Mecanismo de Coleta</th>
+                            <th>Campos Extraídos</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Mercado Livre</strong></td>
+                            <td><code>mercadolivre</code></td>
+                            <td>API Oficial Pública (MLB) + Fallback HTML</td>
+                            <td>Título, preço atual, preço de lista, parcelamento, reputação do vendedor, estoque.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Amazon Brasil</strong></td>
+                            <td><code>amazon_br</code></td>
+                            <td>Scraper HTML assíncrono com cabeçalhos otimizados</td>
+                            <td>Título, ASIN, preço à vista, disponibilidade, imagem em alta resolução.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Zoom / Buscapé</strong></td>
+                            <td><code>zoom</code></td>
+                            <td>Parser de cartões e comparação de lojas</td>
+                            <td>Menor preço entre múltiplos lojistas, histórico de variação.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Genérico (Qualquer Loja)</strong></td>
+                            <td><code>generic</code></td>
+                            <td>Microdata, OpenGraph (<code>og:price</code>) e JSON-LD</td>
+                            <td>Extração universal a partir de tags estruturadas Schema.org (Product).</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>6.2. Como Desenvolver um Novo Conector</h3>
+            <p>
+                Para adicionar um conector especializado para uma nova loja (ex: Magazine Luiza, KaBuM! dedicado), crie um novo arquivo em <code>app/connectors/novaloja.py</code> herdando de <code>BaseConnector</code>:
+            </p>
+            <pre><code>from decimal import Decimal
+from typing import Optional
+from app.connectors.base import BaseConnector, ScrapedItem
+
+class NovaLojaConnector(BaseConnector):
+    def __init__(self):
+        super().__init__("novaloja", "https://www.novaloja.com.br")
+
+    async def search(self, query: str, limit: int = 20) -> list[ScrapedItem]:
+        # Implementar busca via HTTPX ou API da loja
+        return []
+
+    async def fetch_product_details(self, url: str) -> Optional[ScrapedItem]:
+        # Implementar extração de título e preço atualizado
+        return ScrapedItem(
+            title="Nome do Produto Extraído",
+            current_price=Decimal("199.90"),
+            url=url,
+            store_slug=self.site_slug
+        )</code></pre>
+        </section>
+
+        <!-- SEÇÃO 7 -->
+        <section id="sec-7" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 07</span>
+                <h2>Utilização da Interface Web</h2>
+            </div>
+
+            <h3>7.1. Telas da Aplicação</h3>
+            <ul>
+                <li><strong>Radar de Ofertas:</strong> Exibe cards com os melhores negócios do momento. Cada card destaca o <em>Score de Oportunidade</em> (ex: 92/100), o percentual de desconto frente à média móvel histórica de 30 dias e o link direto para a loja.</li>
+                <li><strong>Catálogo de Produtos & Histórico:</strong> Permite visualizar o histórico completo de coletas de um produto com valores de média móvel, mínima e máxima histórica observada.</li>
+                <li><strong>Monitoramentos & Alertas:</strong> Painel onde o usuário gerencia os produtos que está acompanhando, definindo preços-alvo e disparando checagens imediatas no botão <em>⚡ Checar</em>.</li>
+                <li><strong>Cadastro por URL:</strong> Modal com validação anti-SSRF para cadastrar qualquer link de produto de comércio eletrônico.</li>
+            </ul>
+        </section>
+
+        <!-- SEÇÃO 8 -->
+        <section id="sec-8" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 08</span>
+                <h2>Inteligência de Preços & Scoring de Oportunidades</h2>
+            </div>
+
+            <h3>8.1. A Fórmula do Opportunity Score (0 a 100)</h3>
+            <p>
+                O Price Hunter calcula a pontuação de cada anúncio através de quatro componentes ponderados:
+            </p>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Componente</th>
+                            <th>Peso Máximo</th>
+                            <th>Fórmula / Lógica</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Profundidade do Desconto</strong></td>
+                            <td>40 pontos</td>
+                            <td><code>min(40, ((Média_30d - Preço_Atual) / Média_30d) * (40 / 0.30))</code>. 30% de desconto atinge os 40 pontos.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Proximidade da Mínima Histórica</strong></td>
+                            <td>30 pontos</td>
+                            <td>Se o preço atual for igual ou menor que o All-Time Low (ATL), recebe 30 pontos integrais.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Reputação da Loja e Vendedor</strong></td>
+                            <td>15 pontos</td>
+                            <td>Escala normalizada da reputação do marketplace (0 a 10) multiplicada por 1.5.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Densidade Estatística de Amostragem</strong></td>
+                            <td>15 pontos</td>
+                            <td>Confere segurança ao cálculo: 10 ou mais coletas no histórico garantem os 15 pontos de confiança máxima.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="callout callout-warning">
+                <div class="callout-title">🛡️ Penalidade por Desconto Falso (Maquiagem de Preço)</div>
+                Caso o lojista tenha aumentado o preço original anunciado acima de 30% da máxima histórica observada nos últimos 60 dias para simular uma falsa promoção ("metade do dobro"), o sistema detecta a fraude e <strong>penaliza o Score final em 40%</strong>.
+            </div>
+        </section>
+
+        <!-- SEÇÃO 9 -->
+        <section id="sec-9" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 09</span>
+                <h2>Integração com Telegram Bot</h2>
+            </div>
+
+            <h3>9.1. Passo a Passo para Criar o Bot</h3>
+            <ol>
+                <li>Abra o Telegram e inicie uma conversa com o usuário oficial <strong>@BotFather</strong>.</li>
+                <li>Envie o comando <code>/newbot</code>, dê um nome ao bot e escolha um username terminando em <code>bot</code> (ex: <code>meu_price_hunter_bot</code>).</li>
+                <li>Copie o <strong>HTTP API Token</strong> gerado (ex: <code>1234567890:ABCdef...</code>).</li>
+                <li>Inicie uma conversa com seu próprio bot clicando em <em>/start</em>.</li>
+                <li>Fale com o bot <strong>@userinfobot</strong> para descobrir o seu <strong>ID numérico de usuário</strong> (ex: <code>123456789</code>).</li>
+                <li>Insira esses valores nas variáveis <code>TELEGRAM_BOT_TOKEN</code> e <code>TELEGRAM_DEFAULT_CHAT_ID</code> do seu <code>.env</code>.</li>
+            </ol>
+
+            <h3>9.2. Mecanismo de Prevenção de Duplicidade (Cooldown)</h3>
+            <p>
+                Para não importunar o usuário com notificações repetitivas a cada rodada do worker de coleta, o Price Hunter consulta a tabela <code>notifications</code> antes de cada disparo. Se um alerta para o mesmo produto monitorado já foi entregue nas últimas 24 horas (configurável em <code>cooldown_hours</code>), o envio é suprimido até que o preço caia ainda mais.
+            </p>
+        </section>
+
+        <!-- SEÇÃO 10 -->
+        <section id="sec-10" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 10</span>
+                <h2>Operação, Manutenção & Backup</h2>
+            </div>
+
+            <h3>10.1. Visualização de Logs no Portainer</h3>
+            <p>
+                No painel do Portainer, entre na Stack <code>price-hunter</code>, selecione o container <code>pricehunter-backend</code> ou <code>pricehunter-worker</code> e clique no ícone <strong>Quick actions: Logs</strong>. Os logs detalhados exibem requisições, status de scraping e cálculos estatísticos.
+            </p>
+
+            <h3>10.2. Procedimento de Atualização Zero-Downtime</h3>
+            <p>
+                Para atualizar a versão do Price Hunter sem perder os dados persistidos:
+            </p>
+            <pre><code># 1. Puxe a nova versão do repositório
+git pull origin main
+
+# 2. No Portainer, clique na Stack -> Editor -> Update the stack
+# Marque a opção "Re-pull image and redeploy"
+# Os volumes 'postgres_data' e 'redis_data' permanecem intactos!</code></pre>
+
+            <h3>10.3. Backup e Restauração do Banco de Dados</h3>
+            <h4>Backup na Modalidade PostgreSQL Local:</h4>
+            <pre><code>docker exec -t pricehunter-postgres pg_dump -U postgres pricehunter > backup_pricehunter_$(date +%Y%m%d).sql</code></pre>
+
+            <h4>Restauração no PostgreSQL Local:</h4>
+            <pre><code>cat backup_pricehunter_20261017.sql | docker exec -i pricehunter-postgres psql -U postgres -d pricehunter</code></pre>
+
+            <h4>Backup na Modalidade Supabase:</h4>
+            <p>
+                O Supabase executa backups automáticos diários gerenciados pela infraestrutura em nuvem na aba <em>Project Settings ➔ Database ➔ Backups</em>. Restaurações pontuais (Point-in-Time Recovery) estão disponíveis no plano Pro.
+            </p>
+        </section>
+
+        <!-- SEÇÃO 11 -->
+        <section id="sec-11" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 11</span>
+                <h2>Segurança, RLS & Hardening</h2>
+            </div>
+
+            <h3>11.1. Proteção contra Server-Side Request Forgery (SSRF)</h3>
+            <p>
+                Como a plataforma permite que usuários cadastrem anúncios informando URLs externas, o módulo <code>app/services/ssrf_guard.py</code> executa uma validação rigorosa pré-requisição:
+            </p>
+            <ul>
+                <li>Bloqueio de esquemas perigosos (apenas <code>http</code> e <code>https</code> são permitidos; esquemas como <code>file://</code>, <code>gopher://</code>, <code>ftp://</code> são rejeitados).</li>
+                <li>Resolução DNS ativa do hostname com verificação de cada endereço IP retornado contra listas negras de redes privadas (RFC 1918: <code>10.0.0.0/8</code>, <code>172.16.0.0/12</code>, <code>192.168.0.0/16</code>).</li>
+                <li>Bloqueio de endereços loopback (<code>127.0.0.0/8</code>, <code>::1</code>) e serviços de metadados de provedores em nuvem (<code>169.254.169.254</code> da AWS/GCP/Azure).</li>
+            </ul>
+
+            <h3>11.2. Segurança dos Containers Docker</h3>
+            <ul>
+                <li><strong>Usuário Não-Privilegiado (Non-Root):</strong> O container roda sob o usuário <code>appuser</code> (UID 10001), impedindo que invasores obtenham privilégios de root no host caso ocorra uma brecha.</li>
+                <li><strong>Portas Internas Isoladas:</strong> O banco de dados PostgreSQL e o Redis não têm portas mapeadas para a interface externa do host no Compose de produção, comunicando-se exclusivamente pela rede interna em ponte (bridge).</li>
+            </ul>
+        </section>
+
+        <!-- SEÇÃO 12 -->
+        <section id="sec-12" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 12</span>
+                <h2>Guia de Desenvolvimento & Testes</h2>
+            </div>
+
+            <h3>12.1. Execução do Ambiente de Desenvolvimento Local</h3>
+            <pre><code># 1. Clonar repositório e criar ambiente virtual Python
+python -m venv .venv
+source .venv/bin/activate  # No Windows: .venv\Scripts\activate
+
+# 2. Instalar dependências completas
+pip install -r requirements-dev.txt
+
+# 3. Rodar migrações locais no banco de desenvolvimento
+python scripts/migrate.py --db-url "postgresql+psycopg://postgres:postgres@localhost:5432/pricehunter" --up --seed
+
+# 4. Iniciar servidor de desenvolvimento com hot-reload
+uvicorn app.main:app --reload --port 8000</code></pre>
+
+            <h3>12.2. Execução da Suíte de Testes Automatizados</h3>
+            <pre><code>pytest tests/ -v</code></pre>
+            <p>
+                A suíte executa testes em SQLite em memória de altíssima velocidade, validando o motor de inteligência, guard anti-SSRF, avaliação de regras de alerta e endpoints FastAPI com 100% de sucesso.
+            </p>
+        </section>
+
+        <!-- SEÇÃO 13 -->
+        <section id="sec-13" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 13</span>
+                <h2>Limitações, Custos & Comparativo</h2>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Critério de Avaliação</th>
+                            <th>Modalidade PostgreSQL Local (Docker)</th>
+                            <th>Modalidade Supabase Gerenciado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><strong>Custo Financeiro</strong></td>
+                            <td>Zero (100% gratuito e open-source).</td>
+                            <td>Plano gratuito (Free Tier generoso com 500MB de banco); Plano Pro a partir de \$25/mês.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Consumo de RAM no Servidor</strong></td>
+                            <td>Exige ~256MB adicionais para o container Postgres.</td>
+                            <td>Zero consumo de RAM local para o banco; servidor fica mais leve.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Gerenciamento de Backups</strong></td>
+                            <td>Manual (via cron job e script <code>pg_dump</code>).</td>
+                            <td>Automático diário no painel do Supabase.</td>
+                        </tr>
+                        <tr>
+                            <td><strong>Acesso Externo Seguro</strong></td>
+                            <td>Exige VPN, Wireguard ou túnel Cloudflare.</td>
+                            <td>Acesso nativo via SSL com pooler Supavisor global.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <!-- SEÇÃO 14 -->
+        <section id="sec-14" class="manual-section">
+            <div class="section-header">
+                <span class="section-tag">Seção 14</span>
+                <h2>Referência Técnica & Perguntas Frequentes (FAQ)</h2>
+            </div>
+
+            <h3>14.1. Dicionário Completo de Variáveis de Ambiente</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Variável</th>
+                            <th>Obrigatória?</th>
+                            <th>Padrão</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>DATABASE_URL</code></td>
+                            <td><span class="badge badge-req">Sim</span></td>
+                            <td>-</td>
+                            <td>String de conexão PostgreSQL (psycopg3).</td>
+                        </tr>
+                        <tr>
+                            <td><code>DB_POOL_MODE</code></td>
+                            <td><span class="badge badge-req">Sim</span></td>
+                            <td><code>direct</code></td>
+                            <td>Modo de pooler: <code>direct</code>, <code>transaction</code> (Supabase porta 6543) ou <code>session</code>.</td>
+                        </tr>
+                        <tr>
+                            <td><code>TELEGRAM_BOT_TOKEN</code></td>
+                            <td><span class="badge badge-opt">Opcional</span></td>
+                            <td>-</td>
+                            <td>Token HTTP gerado pelo @BotFather para envio de alertas.</td>
+                        </tr>
+                        <tr>
+                            <td><code>TELEGRAM_DEFAULT_CHAT_ID</code></td>
+                            <td><span class="badge badge-opt">Opcional</span></td>
+                            <td>-</td>
+                            <td>Chat ID padrão de destino para notificações.</td>
+                        </tr>
+                        <tr>
+                            <td><code>ALLOW_PRIVATE_IPS</code></td>
+                            <td><span class="badge badge-opt">Opcional</span></td>
+                            <td><code>false</code></td>
+                            <td>Se <code>false</code>, ativa a proteção anti-SSRF rigorosa.</td>
+                        </tr>
+                        <tr>
+                            <td><code>WEB_PORT</code></td>
+                            <td><span class="badge badge-opt">Opcional</span></td>
+                            <td><code>18080</code></td>
+                            <td>Porta do host para acesso à interface web.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>14.2. Principais Endpoints da API REST</h3>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Método</th>
+                            <th>Rota</th>
+                            <th>Descrição</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>GET</code></td>
+                            <td><code>/api/radar</code></td>
+                            <td>Retorna os anúncios com pontuação de oportunidade igual ou superior ao limite.</td>
+                        </tr>
+                        <tr>
+                            <td><code>GET</code></td>
+                            <td><code>/api/listings/{id}</code></td>
+                            <td>Detalhes de um anúncio específico com estatísticas de 30/60/90 dias e histórico.</td>
+                        </tr>
+                        <tr>
+                            <td><code>POST</code></td>
+                            <td><code>/api/monitoring</code></td>
+                            <td>Cadastra um novo produto para monitoramento (via URL segura ou ID do catálogo).</td>
+                        </tr>
+                        <tr>
+                            <td><code>POST</code></td>
+                            <td><code>/api/connectors/test/{slug}</code></td>
+                            <td>Testa a extração e conectividade de uma fonte (mercadolivre, amazon, zoom).</td>
+                        </tr>
+                        <tr>
+                            <td><code>POST</code></td>
+                            <td><code>/api/telegram/test</code></td>
+                            <td>Dispara uma mensagem de teste no Telegram para validar a integração.</td>
+                        </tr>
+                        <tr>
+                            <td><code>GET</code></td>
+                            <td><code>/api/system/health</code></td>
+                            <td>Endpoint de healthcheck para Portainer e Docker.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <h3>14.3. Perguntas Frequentes (FAQ)</h3>
+            <div class="callout callout-info">
+                <div class="callout-title">❓ Como o Price Hunter trata promoções com cupom de desconto?</div>
+                O conector do Mercado Livre e da Amazon extrai o preço efetivo final exibido na tela principal do anúncio. Cupons adicionais informados no carrinho que exigem preenchimento de código podem ser adicionados como anotação no preço alvo desejado.
+            </div>
+
+            <div class="callout callout-info">
+                <div class="callout-title">❓ O que acontece se uma loja mudar a estrutura HTML do site?</div>
+                O Price Hunter utiliza três camadas de redundância: primeiro tenta APIs públicas oficiais (como no Mercado Livre), depois metadados estruturados universais (JSON-LD e OpenGraph). Se ainda assim falhar, o status do conector na tabela <code>connector_configs</code> muda para <code>degraded</code> e o erro é logado sem derrubar os demais serviços.
+            </div>
+        </section>
+
+    </main>
+
+</body>
+</html>

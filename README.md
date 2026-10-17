@@ -48,7 +48,7 @@ docker compose -f docker-compose.supabase.yml up -d --build
 
 ### 3. Acessar a Interface
 Abra no seu navegador:
-- **Interface Web:** `http://localhost:8080`
+- **Interface Web:** `http://localhost:18080`
 - **Documentação Interativa da API (Swagger):** `http://localhost:8000/docs`
 
 ---

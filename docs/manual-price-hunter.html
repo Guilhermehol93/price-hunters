@@ -673,7 +673,7 @@
                     <rect x="30" y="30" width="220" height="150" rx="8" fill="#1e293b" stroke="#38bdf8" stroke-width="1.5"/>
                     <text x="140" y="55" fill="#38bdf8" font-size="14" font-weight="bold" text-anchor="middle">Camada do Usuário</text>
                     <rect x="50" y="75" width="180" height="35" rx="6" fill="#0f172a" stroke="#475569"/>
-                    <text x="140" y="98" fill="#f8fafc" font-size="12" text-anchor="middle">Navegador Web (Porta 8080)</text>
+                    <text x="140" y="98" fill="#f8fafc" font-size="12" text-anchor="middle">Navegador Web (Porta 18080)</text>
                     <rect x="50" y="120" width="180" height="35" rx="6" fill="#0f172a" stroke="#475569"/>
                     <text x="140" y="143" fill="#f8fafc" font-size="12" text-anchor="middle">Telegram App (Mobile / Desktop)</text>
 
@@ -837,7 +837,7 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td><code>8080/tcp</code></td>
+                            <td><code>18080/tcp</code></td>
                             <td>Frontend Web (Nginx)</td>
                             <td>Rede Local (LAN) ou Proxy Reverso HTTPS</td>
                             <td><code>WEB_PORT</code></td>
@@ -918,7 +918,7 @@
                 <div class="step-title">Configurar as Variáveis de Ambiente no Portainer</div>
                 <p>Role até a seção <strong>Environment variables</strong> abaixo do editor e clique em <em>+ Add environment variable</em> para cada item ou utilize <em>Advanced mode</em> para colar o conteúdo do seu <code>.env</code>:</p>
                 <pre><code>ENVIRONMENT=production
-WEB_PORT=8080
+WEB_PORT=18080
 API_PORT=8000
 DATABASE_URL=postgresql+psycopg://postgres:postgres_seguro_123@postgres:5432/pricehunter
 POSTGRES_DB=pricehunter
@@ -951,7 +951,7 @@ REDIS_PASSWORD=senha_redis_forte_987</code></pre>
             <div class="step-container">
                 <div class="step-number">11</div>
                 <div class="step-title">Acessar a Interface Web</div>
-                <p>Abra seu navegador no endereço: <code>http://IP_DO_SERVIDOR:8080</code>. Você deverá visualizar a tela do Radar de Ofertas com o indicador verde no rodapé.</p>
+                <p>Abra seu navegador no endereço: <code>http://IP_DO_SERVIDOR:18080</code>. Você deverá visualizar a tela do Radar de Ofertas com o indicador verde no rodapé.</p>
             </div>
 
             <div class="step-container">
@@ -969,7 +969,7 @@ REDIS_PASSWORD=senha_redis_forte_987</code></pre>
             <h3>4.1. Solução de Problemas Comuns no Portainer (Troubleshooting)</h3>
             <div class="callout callout-warning">
                 <div class="callout-title">⚠️ Erro: Conflito de Porta (Port already allocated)</div>
-                Se a porta 8080 ou 8000 já estiver em uso por outro aplicativo no servidor (ex: Pi-hole, Nextcloud, NginxProxyManager), edite as variáveis de ambiente da Stack no Portainer alterando <code>WEB_PORT=8090</code> ou qualquer porta livre de sua preferência.
+                Se a porta 18080 ou 8000 já estiver em uso por outro aplicativo no servidor (ex: Pi-hole, Nextcloud, NginxProxyManager), edite as variáveis de ambiente da Stack no Portainer alterando <code>WEB_PORT=8090</code> ou qualquer porta livre de sua preferência.
             </div>
 
             <div class="callout callout-danger">
@@ -1375,7 +1375,7 @@ uvicorn app.main:app --reload --port 8000</code></pre>
                         <tr>
                             <td><code>WEB_PORT</code></td>
                             <td><span class="badge badge-opt">Opcional</span></td>
-                            <td><code>8080</code></td>
+                            <td><code>18080</code></td>
                             <td>Porta do host para acesso à interface web.</td>
                         </tr>
                     </tbody>

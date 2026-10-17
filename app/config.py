@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     SUPABASE_SERVICE_ROLE_KEY: str | None = None
     SUPABASE_JWT_SECRET: str | None = None
     USE_SUPABASE_AUTH: bool = False
+    API_ACCESS_TOKEN: str | None = None
 
     # Telegram Bot
     TELEGRAM_BOT_TOKEN: str | None = None

@@ -26,7 +26,7 @@ class AmazonConnector(BaseConnector):
         }
 
         try:
-            async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
                 resp = await client.get(search_url, params=params, headers=headers)
                 if resp.status_code != 200:
                     return items
@@ -75,7 +75,7 @@ class AmazonConnector(BaseConnector):
             "Accept-Language": "pt-BR,pt;q=0.9",
         }
         try:
-            async with httpx.AsyncClient(timeout=15.0, follow_redirects=True) as client:
+            async with httpx.AsyncClient(timeout=15.0, follow_redirects=False) as client:
                 resp = await client.get(url, headers=headers)
                 if resp.status_code != 200:
                     return None

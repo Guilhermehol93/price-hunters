@@ -12,7 +12,7 @@ services:
     container_name: pricehunter-frontend
     restart: unless-stopped
     ports:
-      - "${WEB_PORT:-8080}:80"
+      - "${WEB_PORT:-18080}:80"
     depends_on:
       backend:
         condition: service_healthy
@@ -28,8 +28,6 @@ services:
     restart: unless-stopped
     ports:
       - "${API_PORT:-8000}:8000"
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_secure_pwd_123}@postgres:5432/${POSTGRES_DB:-pricehunter}
       - DB_POOL_MODE=direct
@@ -55,8 +53,6 @@ services:
     image: pricehunter-worker:latest
     container_name: pricehunter-worker
     restart: unless-stopped
-    env_file:
-      - .env
     environment:
       - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_secure_pwd_123}@postgres:5432/${POSTGRES_DB:-pricehunter}
       - DB_POOL_MODE=direct
