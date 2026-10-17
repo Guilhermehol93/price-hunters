@@ -3,6 +3,7 @@
  */
 
 document.addEventListener("DOMContentLoaded", () => {
+    initThemeToggle();
     initNavigation();
     initModals();
     loadDashboardMetrics();
@@ -10,6 +11,43 @@ document.addEventListener("DOMContentLoaded", () => {
     loadSystemHealth();
     initTelegramSettings();
 });
+
+// ----------------------------------------------------------------------------
+// Tema claro/escuro
+// ----------------------------------------------------------------------------
+function initThemeToggle() {
+    const button = document.getElementById("btn-toggle-theme");
+    const icon = button.querySelector(".theme-toggle-icon");
+    const label = button.querySelector(".theme-toggle-label");
+
+    let savedTheme = "light";
+    try {
+        savedTheme = localStorage.getItem("pricehunter-theme") || "light";
+    } catch (err) {
+        // A preferência ainda funciona durante esta sessão se o storage estiver bloqueado.
+    }
+
+    const applyTheme = theme => {
+        const isDark = theme === "dark";
+        document.documentElement.dataset.theme = isDark ? "dark" : "light";
+        button.setAttribute("aria-pressed", String(isDark));
+        button.setAttribute("aria-label", isDark ? "Ativar modo claro" : "Ativar modo escuro");
+        icon.textContent = isDark ? "☀️" : "🌙";
+        label.textContent = isDark ? "Modo claro" : "Modo escuro";
+        document.querySelector('meta[name="theme-color"]')?.setAttribute("content", isDark ? "#101915" : "#14251f");
+    };
+
+    applyTheme(savedTheme === "dark" ? "dark" : "light");
+    button.addEventListener("click", () => {
+        const theme = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+        applyTheme(theme);
+        try {
+            localStorage.setItem("pricehunter-theme", theme);
+        } catch (err) {
+            // O tema selecionado permanece aplicado até a página ser fechada.
+        }
+    });
+}
 
 // ----------------------------------------------------------------------------
 // Navigation Tabs
@@ -357,12 +395,27 @@ window.deleteMonitored = async function(id) {
 // ----------------------------------------------------------------------------
 async function loadConnectorsGrid() {
     const container = document.getElementById("connectors-container");
-    container.innerHTML = "<p>Carregando conectores cadastrados...</p>";
+    container.innerHTML = '<p class="connectors-message">Carregando fontes e conectores...</p>';
 
     try {
         const res = await fetch("/api/connectors/sites");
-        if (!res.ok) throw new Error("Erro");
+        if (!res.ok) {
+            let detail = "";
+            try {
+                const payload = await res.json();
+                detail = payload.detail || payload.message || "";
+            } catch (err) {
+                // A resposta pode não conter JSON.
+            }
+            throw new Error(detail || `API respondeu HTTP ${res.status} (${res.statusText || "falha na consulta"})`);
+        }
         const sites = await res.json();
+        if (!Array.isArray(sites)) throw new Error("A API retornou uma lista de fontes inválida.");
+
+        if (sites.length === 0) {
+            container.innerHTML = '<div class="connectors-empty"><span>🔌</span><h3>Nenhuma fonte cadastrada</h3><p>Não há sites de busca configurados no banco de dados.</p></div>';
+            return;
+        }
 
         container.innerHTML = sites.map(s => `
             <div class="metric-card" style="margin-bottom: 12px;">
@@ -370,7 +423,7 @@ async function loadConnectorsGrid() {
                 <div style="flex: 1;">
                     <div style="display: flex; justify-content: space-between; align-items: center;">
                         <h4 style="font-size: 16px;">${escapeHtml(s.name)}</h4>
-                        <span class="badge badge-success">Conector Ativo</span>
+                        <span class="badge ${s.is_active ? "badge-success" : "badge-disabled"}">${s.is_active ? "Fonte ativa" : "Fonte inativa"}</span>
                     </div>
                     <small style="color: var(--text-muted);">${escapeHtml(s.base_url)}</small>
                 </div>
@@ -378,9 +431,15 @@ async function loadConnectorsGrid() {
             </div>
         `).join("");
     } catch (err) {
-        container.innerHTML = `<p style="color: var(--accent-danger);">Erro: ${err.message}</p>`;
+        container.innerHTML = `
+            <div class="connectors-error" role="alert">
+                <div><strong>Não foi possível carregar as fontes.</strong><p>${escapeHtml(err.message || "Falha de comunicação com a API.")}</p></div>
+                <button class="btn btn-secondary" type="button" onclick="loadConnectorsGrid()">Tentar novamente</button>
+            </div>`;
     }
 }
+
+window.loadConnectorsGrid = loadConnectorsGrid;
 
 window.testConnector = async function(slug) {
     try {
