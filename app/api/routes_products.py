@@ -9,6 +9,10 @@ from app.repositories.product_repo import ProductRepository
 from app.models.product import Product, ProductVariant
 from app.schemas.product import ProductCreate, ProductUpdate, ProductResponse
 
+import logging
+
+logger = logging.getLogger(__name__)
+
 router = APIRouter(prefix="/products", tags=["Produtos"])
 
 
@@ -20,15 +24,29 @@ def list_products(
     db: Session = Depends(get_db)
 ):
     repo = ProductRepository(db)
-    if q:
-        return repo.search_by_term(q, limit=limit)
-    return repo.list_all(skip=skip, limit=limit)
+    try:
+        if q:
+            return repo.search_by_term(q, limit=limit)
+        return repo.list_all(skip=skip, limit=limit)
+    except Exception as e:
+        logger.error(f"Erro ao listar produtos do catálogo: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Não foi possível consultar os produtos no banco de dados. Verifique a conexão com o PostgreSQL/Supabase."
+        )
 
 
 @router.get("/{product_id}", response_model=ProductResponse)
 def get_product(product_id: UUID, db: Session = Depends(get_db)):
     repo = ProductRepository(db)
-    product = repo.get_with_variants(product_id)
+    try:
+        product = repo.get_with_variants(product_id)
+    except Exception as e:
+        logger.error(f"Erro ao buscar produto {product_id}: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Não foi possível consultar o produto no banco de dados."
+        )
     if not product:
         raise HTTPException(status_code=404, detail="Produto não encontrado")
     return product

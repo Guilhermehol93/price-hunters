@@ -15,6 +15,8 @@ def get_telegram_status():
     return {
         "configured": service.is_configured,
         "bot_token_present": bool(settings.TELEGRAM_BOT_TOKEN),
+        "enabled": settings.TELEGRAM_ENABLED,
+        "default_chat_id": settings.TELEGRAM_DEFAULT_CHAT_ID,
         "cooldown_hours": settings.TELEGRAM_ALERT_COOLDOWN_HOURS,
     }
 
@@ -22,6 +24,8 @@ def get_telegram_status():
 @router.post("/test", response_model=TelegramTestResponse, dependencies=[Depends(require_api_access)])
 async def send_test_telegram():
     service = TelegramService()
+    if not settings.TELEGRAM_ENABLED:
+        raise HTTPException(status_code=400, detail="A integração está desativada por TELEGRAM_ENABLED.")
     if not service.is_configured:
         raise HTTPException(
             status_code=400,

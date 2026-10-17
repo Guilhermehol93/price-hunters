@@ -32,6 +32,10 @@ services:
       - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_secure_pwd_123}@postgres:5432/${POSTGRES_DB:-pricehunter}
       - DB_POOL_MODE=direct
       - REDIS_URL=redis://:${REDIS_PASSWORD:-pricehunter_redis_secret}@redis:6379/0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_DEFAULT_CHAT_ID=${TELEGRAM_DEFAULT_CHAT_ID:-}
+      - TELEGRAM_ALERT_COOLDOWN_HOURS=${TELEGRAM_ALERT_COOLDOWN_HOURS:-24}
+      - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-true}
     depends_on:
       postgres:
         condition: service_healthy
@@ -57,6 +61,10 @@ services:
       - DATABASE_URL=postgresql+psycopg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres_secure_pwd_123}@postgres:5432/${POSTGRES_DB:-pricehunter}
       - DB_POOL_MODE=direct
       - REDIS_URL=redis://:${REDIS_PASSWORD:-pricehunter_redis_secret}@redis:6379/0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_DEFAULT_CHAT_ID=${TELEGRAM_DEFAULT_CHAT_ID:-}
+      - TELEGRAM_ALERT_COOLDOWN_HOURS=${TELEGRAM_ALERT_COOLDOWN_HOURS:-24}
+      - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-true}
     depends_on:
       backend:
         condition: service_healthy

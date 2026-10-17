@@ -61,7 +61,7 @@ function initNavigation() {
     const titles = {
         radar: {
             title: "Radar de Ofertas",
-            subtitle: "Ofertas com alta pontuação de oportunidade detectadas automaticamente"
+            subtitle: "Ofertas do catálogo Price Hunter filtradas por desconto e pontuação de oportunidade"
         },
         products: {
             title: "Catálogo de Produtos & Histórico",
@@ -107,13 +107,31 @@ function initNavigation() {
 
     document.getElementById("btn-refresh-data").addEventListener("click", () => {
         loadDashboardMetrics();
-        loadRadarDeals();
+        loadSystemHealth();
+        const activeTab = document.querySelector(".nav-item.active")?.getAttribute("data-tab");
+        if (activeTab === "radar") loadRadarDeals();
+        else if (activeTab === "products") loadProductsTable();
+        else if (activeTab === "monitoring") loadMonitoringTable();
+        else if (activeTab === "connectors") loadConnectorsGrid();
+        else if (activeTab === "settings") loadTelegramStatus();
     });
 
     // Filtros do Radar
     document.getElementById("filter-score").addEventListener("change", loadRadarDeals);
     document.getElementById("filter-discount").addEventListener("change", loadRadarDeals);
     document.getElementById("filter-store").addEventListener("change", loadRadarDeals);
+
+    // Busca de Produtos
+    const searchInput = document.getElementById("search-products-input");
+    if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener("input", (e) => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => {
+                loadProductsTable(e.target.value.trim());
+            }, 300);
+        });
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -125,28 +143,44 @@ async function loadDashboardMetrics() {
         if (!res.ok) return;
         const data = await res.json();
 
-        document.getElementById("metric-products-count").textContent = data.products_count || 0;
-        document.getElementById("metric-monitoring-count").textContent = data.monitored_products_count || 0;
-        document.getElementById("metric-history-count").textContent = data.price_history_snapshots || 0;
+        document.getElementById("metric-products-count").textContent = data.products_count ?? 0;
+        document.getElementById("metric-monitoring-count").textContent = data.monitored_products_count ?? 0;
+        document.getElementById("metric-history-count").textContent = data.price_history_snapshots ?? 0;
     } catch (err) {
         console.error("Falha ao carregar métricas:", err);
     }
 }
 
 async function loadSystemHealth() {
+    const ind = document.getElementById("system-status-indicator");
     try {
         const res = await fetch("/api/system/health");
-        const ind = document.getElementById("system-status-indicator");
         if (res.ok) {
             const data = await res.json();
-            ind.innerHTML = `<span class="dot dot-online"></span><span class="status-text">${data.database.status.toUpperCase()} (${data.database.latency_ms}ms)</span>`;
+            const dbConnected = data.database && data.database.status === "connected";
+            if (dbConnected) {
+                ind.innerHTML = `<span class="dot dot-online"></span><span class="status-text">${data.database.status.toUpperCase()} (${data.database.latency_ms}ms)</span>`;
+            } else {
+                ind.innerHTML = `<span class="dot" style="background: #ef4444;"></span><span class="status-text">BANCO DESCONECTADO</span>`;
+            }
         } else {
             ind.innerHTML = `<span class="dot" style="background: #ef4444;"></span><span class="status-text">OFFLINE</span>`;
         }
     } catch {
-        const ind = document.getElementById("system-status-indicator");
         ind.innerHTML = `<span class="dot" style="background: #ef4444;"></span><span class="status-text">SEM CONEXÃO</span>`;
     }
+}
+
+// ----------------------------------------------------------------------------
+// Helper de Tratamento de Erros da API
+// ----------------------------------------------------------------------------
+async function extractErrorMessage(res, defaultMsg = "Erro na requisição") {
+    try {
+        const data = await res.json();
+        if (data.detail) return typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail);
+        if (data.message) return data.message;
+    } catch {}
+    return `HTTP ${res.status}: ${res.statusText || defaultMsg}`;
 }
 
 // ----------------------------------------------------------------------------
@@ -168,12 +202,15 @@ async function loadRadarDeals() {
 
     try {
         const res = await fetch(`/api/radar?${params.toString()}`);
-        if (!res.ok) throw new Error("Erro na requisição");
+        if (!res.ok) {
+            const errorMsg = await extractErrorMessage(res, "Falha ao consultar radar");
+            throw new Error(errorMsg);
+        }
         const deals = await res.json();
 
         document.getElementById("metric-radar-count").textContent = deals.length;
 
-        if (deals.length === 0) {
+        if (!Array.isArray(deals) || deals.length === 0) {
             container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">
                     Nenhuma oferta encontrada para os filtros selecionados. Tente reduzir o score mínimo.
@@ -212,7 +249,12 @@ async function loadRadarDeals() {
         }).join("");
 
     } catch (err) {
-        container.innerHTML = `<div style="grid-column: 1/-1; color: var(--accent-danger); text-align: center; padding: 40px;">Erro ao carregar radar: ${err.message}</div>`;
+        container.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 40px 20px; color: var(--accent-danger);">
+                <div style="font-weight: 600; margin-bottom: 6px;">Erro ao carregar radar de ofertas</div>
+                <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">${escapeHtml(err.message || "Falha de comunicação")}</div>
+                <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px;" onclick="loadRadarDeals()">🔄 Tentar novamente</button>
+            </div>`;
     }
 }
 
@@ -292,17 +334,25 @@ window.openListingDetails = async function(listingId) {
 // ----------------------------------------------------------------------------
 // Aba de Produtos
 // ----------------------------------------------------------------------------
-async function loadProductsTable() {
+async function loadProductsTable(searchTerm = "") {
     const tbody = document.getElementById("products-table-body");
-    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Carregando produtos...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">Carregando catálogo de produtos...</td></tr>`;
 
     try {
-        const res = await fetch("/api/products");
-        if (!res.ok) throw new Error("Erro");
+        const url = searchTerm
+            ? `/api/products?q=${encodeURIComponent(searchTerm)}`
+            : "/api/products";
+        const res = await fetch(url);
+        if (!res.ok) {
+            const errorMsg = await extractErrorMessage(res, "Falha ao carregar produtos");
+            throw new Error(errorMsg);
+        }
         const products = await res.json();
 
-        if (products.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center;">Nenhum produto cadastrado no catálogo.</td></tr>`;
+        if (!Array.isArray(products) || products.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 40px;">
+                ${searchTerm ? `Nenhum produto encontrado para "${escapeHtml(searchTerm)}".` : "Nenhum produto cadastrado no catálogo ainda."}
+            </td></tr>`;
             return;
         }
 
@@ -313,31 +363,81 @@ async function loadProductsTable() {
                 <td>${escapeHtml(p.brand || "-")}</td>
                 <td><code>${escapeHtml(p.ean_gtin || "-")}</code></td>
                 <td>
-                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="addMonitoringForProduct('${p.id}')">
+                    <button class="btn btn-secondary" style="padding: 4px 8px; font-size: 12px;" onclick="addMonitoringForProduct('${p.id}', '${escapeHtml(p.title)}')">
                         🔔 Monitorar
                     </button>
                 </td>
             </tr>
         `).join("");
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="5" style="color: var(--accent-danger); text-align: center;">Erro: ${err.message}</td></tr>`;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" style="color: var(--accent-danger); text-align: center; padding: 30px 20px;">
+                    <div style="font-weight: 600; margin-bottom: 6px;">Não foi possível consultar os produtos</div>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">${escapeHtml(err.message || "Falha de comunicação")}</div>
+                    <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px;" onclick="loadProductsTable('${escapeHtml(searchTerm)}')">🔄 Tentar novamente</button>
+                </td>
+            </tr>
+        `;
     }
 }
+
+window.loadProductsTable = loadProductsTable;
+
+window.addMonitoringForProduct = async function(productId, productTitle) {
+    const targetPriceStr = prompt(`Defina o preço alvo para monitorar "${productTitle || 'este produto'}":\n(Deixe em branco para monitorar sem meta de preço específica)`);
+    if (targetPriceStr === null) return;
+
+    const trimmed = targetPriceStr.trim();
+    let targetPrice = null;
+    if (trimmed) {
+        targetPrice = parseFloat(trimmed.replace(",", "."));
+        if (isNaN(targetPrice) || targetPrice <= 0) {
+            alert("Por favor, informe um valor numérico válido para o preço alvo.");
+            return;
+        }
+    }
+
+    try {
+        const res = await fetch("/api/monitoring", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                product_id: productId,
+                target_price: targetPrice,
+                check_frequency_minutes: 60
+            })
+        });
+
+        if (!res.ok) {
+            const errorMsg = await extractErrorMessage(res, "Falha ao criar monitoramento");
+            throw new Error(errorMsg);
+        }
+
+        alert("Produto adicionado ao seu monitoramento com sucesso!");
+        loadDashboardMetrics();
+    } catch (err) {
+        alert("Erro ao monitorar: " + err.message);
+    }
+};
 
 // ----------------------------------------------------------------------------
 // Aba de Monitoramentos
 // ----------------------------------------------------------------------------
 async function loadMonitoringTable() {
     const tbody = document.getElementById("monitoring-table-body");
-    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Carregando itens monitorados...</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 30px;">Carregando itens monitorados...</td></tr>`;
 
     try {
         const res = await fetch("/api/monitoring");
-        if (!res.ok) throw new Error("Erro");
+        if (!res.ok) {
+            const errorMsg = await extractErrorMessage(res, "Falha ao listar monitoramentos");
+            throw new Error(errorMsg);
+        }
         const items = await res.json();
 
-        if (items.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center;">Nenhum produto monitorado no momento. Cadastre uma URL para começar!</td></tr>`;
+        if (!Array.isArray(items) || items.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 40px;">Nenhum produto monitorado no momento. Cadastre uma URL para começar!</td></tr>`;
             return;
         }
 
@@ -361,7 +461,15 @@ async function loadMonitoringTable() {
             `;
         }).join("");
     } catch (err) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color: var(--accent-danger); text-align: center;">Erro: ${err.message}</td></tr>`;
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="6" style="color: var(--accent-danger); text-align: center; padding: 30px 20px;">
+                    <div style="font-weight: 600; margin-bottom: 6px;">Não foi possível consultar os monitoramentos</div>
+                    <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px;">${escapeHtml(err.message || "Falha de comunicação")}</div>
+                    <button class="btn btn-secondary" style="font-size: 12px; padding: 4px 10px;" onclick="loadMonitoringTable()">🔄 Tentar novamente</button>
+                </td>
+            </tr>
+        `;
     }
 }
 
@@ -469,12 +577,15 @@ async function loadTelegramStatus() {
             if (data.default_chat_id) {
                 document.getElementById("input-telegram-chat-id").value = data.default_chat_id;
             }
+        } else if (data.enabled === false) {
+            statusBadge.className = "badge badge-disabled";
+            statusBadge.textContent = "Integração desativada (TELEGRAM_ENABLED=false)";
         } else {
-            statusBadge.className = "badge";
-            statusBadge.style.background = "#f59e0b";
-            statusBadge.textContent = "Token Ausente (configure TELEGRAM_BOT_TOKEN no .env)";
+            statusBadge.className = "badge badge-warning";
+            statusBadge.textContent = "Token ausente nas variáveis de ambiente do serviço (TELEGRAM_BOT_TOKEN)";
         }
     } catch {
+        statusBadge.className = "badge badge-warning";
         statusBadge.textContent = "Erro ao consultar status";
     }
 }

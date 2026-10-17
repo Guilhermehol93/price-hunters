@@ -12,6 +12,15 @@ class ProductRepository(BaseRepository[Product]):
     def __init__(self, db: Session):
         super().__init__(Product, db)
 
+    def list_all(self, skip: int = 0, limit: int = 100) -> Sequence[Product]:
+        stmt = (
+            select(Product)
+            .options(selectinload(Product.variants))
+            .offset(skip)
+            .limit(limit)
+        )
+        return self.db.scalars(stmt).all()
+
     def get_with_variants(self, product_id: UUID) -> Optional[Product]:
         stmt = (
             select(Product)
@@ -24,6 +33,7 @@ class ProductRepository(BaseRepository[Product]):
         pattern = f"%{term}%"
         stmt = (
             select(Product)
+            .options(selectinload(Product.variants))
             .where(
                 (Product.title.ilike(pattern)) |
                 (Product.brand.ilike(pattern)) |

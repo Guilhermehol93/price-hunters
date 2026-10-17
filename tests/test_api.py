@@ -76,3 +76,51 @@ def test_telegram_status(client):
     assert res.status_code == 200
     data = res.json()
     assert "configured" in data
+
+
+def test_list_products_empty(client):
+    res = client.get("/api/products")
+    assert res.status_code == 200
+    assert res.json() == []
+
+
+def test_search_products(client):
+    payload1 = {"title": "Mouse Gamer Logitech G502", "brand": "Logitech", "category": "Periféricos"}
+    payload2 = {"title": "Teclado Mecânico Redragon", "brand": "Redragon", "category": "Teclados"}
+    client.post("/api/products", json=payload1)
+    client.post("/api/products", json=payload2)
+
+    res = client.get("/api/products?q=Logitech")
+    assert res.status_code == 200
+    items = res.json()
+    assert len(items) == 1
+    assert items[0]["brand"] == "Logitech"
+
+
+def test_monitoring_endpoints(client):
+    # Lista monitoramentos inicialmente vazia
+    res = client.get("/api/monitoring")
+    assert res.status_code == 200
+    assert res.json() == []
+
+    # Criar um produto primeiro
+    prod_res = client.post("/api/products", json={"title": "Fone Bluetooth JBL", "brand": "JBL"})
+    assert prod_res.status_code == 201
+    prod_id = prod_res.json()["id"]
+
+    # Adicionar monitoramento para o produto criado
+    mon_payload = {
+        "product_id": prod_id,
+        "target_price": 199.90,
+        "check_frequency_minutes": 30
+    }
+    create_res = client.post("/api/monitoring", json=mon_payload)
+    assert create_res.status_code == 201
+    mon_data = create_res.json()
+    assert mon_data["product_id"] == prod_id
+    assert float(mon_data["target_price"]) == 199.90
+
+    # Consultar lista
+    list_res = client.get("/api/monitoring")
+    assert list_res.status_code == 200
+    assert len(list_res.json()) == 1

@@ -15,7 +15,7 @@ class TelegramService:
 
     @property
     def is_configured(self) -> bool:
-        return bool(self.token and len(self.token) > 10)
+        return bool(settings.TELEGRAM_ENABLED and self.token and len(self.token) > 10)
 
     async def send_message(
         self,

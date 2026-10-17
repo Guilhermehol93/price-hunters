@@ -2,11 +2,15 @@
 
 from typing import Optional
 from decimal import Decimal
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.repositories.listing_repo import ListingRepository
 from app.schemas.listing import CommercialListingResponse
+
+import logging
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/radar", tags=["Radar de Ofertas"])
 
@@ -21,11 +25,18 @@ def get_radar_deals(
     db: Session = Depends(get_db)
 ):
     repo = ListingRepository(db)
-    deals = repo.get_radar_deals(
-        min_score=min_score,
-        min_discount_pct=Decimal(str(min_discount)),
-        store_slug=store,
-        category=category,
-        limit=limit
-    )
-    return deals
+    try:
+        deals = repo.get_radar_deals(
+            min_score=min_score,
+            min_discount_pct=Decimal(str(min_discount)),
+            store_slug=store,
+            category=category,
+            limit=limit
+        )
+        return deals
+    except Exception as e:
+        logger.error(f"Erro ao buscar ofertas no radar: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=503,
+            detail="Não foi possível buscar as ofertas no banco de dados. Verifique a conexão com o PostgreSQL/Supabase."
+        )

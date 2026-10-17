@@ -110,6 +110,7 @@ select:focus, input:focus { border-color: #71b99a !important; box-shadow: 0 0 0 
 .badge { display: inline-block; padding: 5px 9px; border-radius: 99px; font-size: 10px; font-weight: 700; }
 .badge-info { color: #376b9b; background: #eaf3fb; }
 .badge-success { color: var(--green-dark); background: var(--green-soft); }
+.badge-warning { color: #986219; background: #fff2d8; }
 .badge-disabled { color: #66736b; background: #edf0ee; }
 .connectors-message { color: var(--muted); }
 .connectors-empty, .connectors-error { display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 20px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface); }
@@ -149,6 +150,8 @@ select:focus, input:focus { border-color: #71b99a !important; box-shadow: 0 0 0 
 :root[data-theme="dark"] .data-table th { color: #aab9b0; background: #202d26; }
 :root[data-theme="dark"] .data-table tbody tr:hover td { background: #1c2a22; }
 :root[data-theme="dark"] .score-badge { color: #e8bd70; background: #403522; }
+:root[data-theme="dark"] .badge-warning { color: #f0cc83; background: #40351f; }
+:root[data-theme="dark"] .badge-disabled { color: #bdc9c1; background: #2a3830; }
 :root[data-theme="dark"] .connectors-error { border-color: #583632; background: #2b1e1c; }
 :root[data-theme="dark"] .alert-info { border-color: #314b5c; color: #b1d4ed; background: #1b2b35; }
 :root[data-theme="dark"] .btn-close { color: #bac8bf; background: #26352d; }

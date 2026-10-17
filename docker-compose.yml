@@ -43,6 +43,10 @@ services:
     environment:
       - PORT=8000
       - HOST=0.0.0.0
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_DEFAULT_CHAT_ID=${TELEGRAM_DEFAULT_CHAT_ID:-}
+      - TELEGRAM_ALERT_COOLDOWN_HOURS=${TELEGRAM_ALERT_COOLDOWN_HOURS:-24}
+      - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-true}
     networks:
       - pricehunter-network
     healthcheck:
@@ -67,6 +71,11 @@ services:
     image: pricehunter-worker:latest
     container_name: pricehunter-worker
     restart: unless-stopped
+    environment:
+      - TELEGRAM_BOT_TOKEN=${TELEGRAM_BOT_TOKEN:-}
+      - TELEGRAM_DEFAULT_CHAT_ID=${TELEGRAM_DEFAULT_CHAT_ID:-}
+      - TELEGRAM_ALERT_COOLDOWN_HOURS=${TELEGRAM_ALERT_COOLDOWN_HOURS:-24}
+      - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-true}
     depends_on:
       backend:
         condition: service_healthy
