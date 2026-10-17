@@ -1,0 +1,149 @@
+# ==============================================================================
+# Price Hunter - Docker Compose Principal para Portainer
+# Suporta PostgreSQL Local ou Supabase Gerenciado Externo via .env
+# ==============================================================================
+version: '3.8'
+
+services:
+  # ----------------------------------------------------------------------------
+  # 1. Interface Web (Frontend Nginx)
+  # ----------------------------------------------------------------------------
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: pricehunter-frontend:latest
+    container_name: pricehunter-frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pricehunter-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  # ----------------------------------------------------------------------------
+  # 2. API Backend (FastAPI Python)
+  # ----------------------------------------------------------------------------
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: pricehunter-backend:latest
+    container_name: pricehunter-backend
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    env_file:
+      - .env
+    environment:
+      - PORT=8000
+      - HOST=0.0.0.0
+    networks:
+      - pricehunter-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/system/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # 3. Worker de Coleta e Monitoramento
+  # ----------------------------------------------------------------------------
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: pricehunter-worker:latest
+    container_name: pricehunter-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pricehunter-network
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+  # ----------------------------------------------------------------------------
+  # 4. Redis (Cache e Filas de Tarefas)
+  # ----------------------------------------------------------------------------
+  redis:
+    image: redis:7.2-alpine
+    container_name: pricehunter-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-pricehunter_redis_secret}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pricehunter-network
+    deploy:
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+
+  # ----------------------------------------------------------------------------
+  # 5. PostgreSQL Local (Opcional - Usado quando NÃO utilizar Supabase)
+  # Para desativar quando usar Supabase externo, remova ou comente este bloco
+  # ou utilize o arquivo docker-compose.supabase.yml
+  # ----------------------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: pricehunter-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-pricehunter}
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-postgres_secure_pwd_123}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./database/migrations:/docker-entrypoint-initdb.d:ro
+    networks:
+      - pricehunter-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-postgres} -d ${POSTGRES_DB:-pricehunter}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'
+          memory: 512M
+
+# ------------------------------------------------------------------------------
+# Volumes Persistentes
+# ------------------------------------------------------------------------------
+volumes:
+  postgres_data:
+    name: pricehunter_postgres_data
+    driver: local
+  redis_data:
+    name: pricehunter_redis_data
+    driver: local
+
+# ------------------------------------------------------------------------------
+# Rede Interna Isolada
+# ------------------------------------------------------------------------------
+networks:
+  pricehunter-network:
+    name: pricehunter-network
+    driver: bridge

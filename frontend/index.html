@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Price Hunter — Radar de Ofertas & Inteligência de Preços</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+</head>
+<body class="dark-theme">
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="brand-logo">🎯</div>
+                <div class="brand-text">
+                    <h1>Price Hunter</h1>
+                    <span class="badge-version">v1.0.0</span>
+                </div>
+            </div>
+
+            <nav class="nav-menu">
+                <button class="nav-item active" data-tab="radar">
+                    <span class="icon">🔥</span>
+                    <span>Radar de Ofertas</span>
+                </button>
+                <button class="nav-item" data-tab="products">
+                    <span class="icon">📦</span>
+                    <span>Produtos & Histórico</span>
+                </button>
+                <button class="nav-item" data-tab="monitoring">
+                    <span class="icon">🔔</span>
+                    <span>Monitoramentos</span>
+                </button>
+                <button class="nav-item" data-tab="connectors">
+                    <span class="icon">🔌</span>
+                    <span>Conectores & Fontes</span>
+                </button>
+                <button class="nav-item" data-tab="settings">
+                    <span class="icon">⚙️</span>
+                    <span>Configurações & Telegram</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="system-status" id="system-status-indicator">
+                    <span class="dot dot-online"></span>
+                    <span class="status-text">PostgreSQL / Supabase OK</span>
+                </div>
+                <a href="/docs" target="_blank" class="link-api">Documentação API ↗</a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="main-content">
+            <!-- Header Bar -->
+            <header class="topbar">
+                <div class="topbar-left">
+                    <h2 id="view-title">Radar de Ofertas</h2>
+                    <p id="view-subtitle">Ofertas com alta pontuação de oportunidade detectadas automaticamente</p>
+                </div>
+                <div class="topbar-actions">
+                    <button class="btn btn-primary" id="btn-open-add-url">
+                        <span>➕</span> Cadastrar por URL
+                    </button>
+                    <button class="btn btn-secondary" id="btn-refresh-data">
+                        <span>🔄</span> Atualizar
+                    </button>
+                </div>
+            </header>
+
+            <!-- Metrics Bar -->
+            <section class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">🔥</div>
+                    <div class="metric-info">
+                        <span class="metric-label">Ofertas Ativas no Radar</span>
+                        <span class="metric-value" id="metric-radar-count">3</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📦</div>
+                    <div class="metric-info">
+                        <span class="metric-label">Produtos Cadastrados</span>
+                        <span class="metric-value" id="metric-products-count">--</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">🔔</div>
+                    <div class="metric-info">
+                        <span class="metric-label">Monitoramentos Ativos</span>
+                        <span class="metric-value" id="metric-monitoring-count">--</span>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">📊</div>
+                    <div class="metric-info">
+                        <span class="metric-label">Snapshots de Histórico</span>
+                        <span class="metric-value" id="metric-history-count">--</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- View: Radar de Ofertas -->
+            <section id="tab-radar" class="tab-pane active">
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>Score Mínimo:</label>
+                        <select id="filter-score">
+                            <option value="60">Acima de 60</option>
+                            <option value="70" selected>Acima de 70 (Recomendado)</option>
+                            <option value="80">Acima de 80 (Excepcional)</option>
+                            <option value="90">Acima de 90 (Imperdível)</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Desconto Mínimo:</label>
+                        <select id="filter-discount">
+                            <option value="5">5% ou mais</option>
+                            <option value="10" selected>10% ou mais</option>
+                            <option value="20">20% ou mais</option>
+                            <option value="30">30% ou mais</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>Loja:</label>
+                        <select id="filter-store">
+                            <option value="">Todas as lojas</option>
+                            <option value="mercadolivre">Mercado Livre</option>
+                            <option value="amazon">Amazon Brasil</option>
+                            <option value="kabum">KaBuM!</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="deals-grid" id="radar-deals-container">
+                    <!-- Cards de ofertas injetados dinamicamente via JS -->
+                </div>
+            </section>
+
+            <!-- View: Produtos & Histórico -->
+            <section id="tab-products" class="tab-pane">
+                <div class="search-box">
+                    <input type="text" id="search-products-input" placeholder="Buscar por título, modelo, marca ou EAN...">
+                </div>
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Produto</th>
+                                <th>Categoria</th>
+                                <th>Marca</th>
+                                <th>EAN / GTIN</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="products-table-body">
+                            <!-- Injetado dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- View: Monitoramentos -->
+            <section id="tab-monitoring" class="tab-pane">
+                <div class="table-container">
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Item Monitorado</th>
+                                <th>Preço Alvo</th>
+                                <th>Freq. Verificação</th>
+                                <th>Status</th>
+                                <th>Última Checagem</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="monitoring-table-body">
+                            <!-- Injetado dinamicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- View: Conectores & Fontes -->
+            <section id="tab-connectors" class="tab-pane">
+                <div class="connectors-grid" id="connectors-container">
+                    <!-- Cards de conectores injetados dinamicamente -->
+                </div>
+            </section>
+
+            <!-- View: Configurações & Telegram -->
+            <section id="tab-settings" class="tab-pane">
+                <div class="settings-card">
+                    <h3>Integração com Telegram Bot</h3>
+                    <p class="settings-desc">Receba notificações instantâneas no seu celular sempre que uma oferta atingir o preço alvo ou o radar identificar uma oportunidade de alto impacto.</p>
+                    
+                    <div class="form-group">
+                        <label>Status do Bot:</label>
+                        <div id="telegram-config-status" class="badge badge-info">Verificando...</div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="input-telegram-chat-id">Chat ID do Telegram:</label>
+                        <input type="text" id="input-telegram-chat-id" placeholder="Ex: 123456789 ou -100123456789">
+                        <small>Obtenha seu ID conversando com o bot <code>@userinfobot</code> no Telegram.</small>
+                    </div>
+
+                    <div class="settings-actions">
+                        <button class="btn btn-secondary" id="btn-test-telegram">
+                            ✈️ Enviar Alerta de Teste
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Modal: Cadastrar por URL -->
+    <div class="modal-backdrop" id="modal-add-url">
+        <div class="modal-window">
+            <div class="modal-header">
+                <h3>Cadastrar Produto por URL</h3>
+                <button class="btn-close" id="btn-close-modal">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    🛡️ <b>Proteção SSRF Ativa:</b> A URL inserida é checada rigorosamente contra endereços IP privados, localhost e redes corporativas internas.
+                </div>
+                <div class="form-group">
+                    <label for="input-custom-url">URL do Anúncio:</label>
+                    <input type="url" id="input-custom-url" placeholder="https://www.mercadolivre.com.br/... ou https://www.amazon.com.br/dp/..." required>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="input-target-price">Preço Alvo Desejado (R$):</label>
+                        <input type="number" step="0.01" id="input-target-price" placeholder="Opcional">
+                    </div>
+                    <div class="form-group">
+                        <label for="input-frequency">Frequência (minutos):</label>
+                        <input type="number" id="input-frequency" value="60" min="5">
+                    </div>
+                </div>
+                <div id="modal-url-error" class="error-feedback" style="display: none;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" id="btn-cancel-modal">Cancelar</button>
+                <button class="btn btn-primary" id="btn-submit-url">Cadastrar & Monitorar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal: Detalhes e Gráfico de Histórico -->
+    <div class="modal-backdrop" id="modal-details">
+        <div class="modal-window modal-large">
+            <div class="modal-header">
+                <h3 id="modal-details-title">Histórico de Preços</h3>
+                <button class="btn-close" id="btn-close-details">✕</button>
+            </div>
+            <div class="modal-body" id="modal-details-body">
+                <!-- Conteúdo de estatísticas e timeline de preços -->
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

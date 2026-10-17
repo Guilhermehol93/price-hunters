@@ -1,0 +1,41 @@
+# ==============================================================================
+# Dockerfile Worker / Scheduler - Price Hunter
+# Multi-stage, non-root user, background crawling and alert worker
+# ==============================================================================
+
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+FROM python:3.11-slim-bookworm AS runtime
+
+WORKDIR /app
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/bash -m appuser
+
+COPY --from=builder /root/.local /home/appuser/.local
+ENV PATH=/home/appuser/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+COPY --chown=appuser:appgroup app /app/app
+COPY --chown=appuser:appgroup database /app/database
+COPY --chown=appuser:appgroup scripts /app/scripts
+
+USER appuser
+
+CMD ["python", "-m", "app.workers.task_worker"]

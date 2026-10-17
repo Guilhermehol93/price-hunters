@@ -1,0 +1,76 @@
+# ==============================================================================
+# Price Hunter - Modalidade 2: Supabase Externo (Sem container PostgreSQL local)
+# O banco de dados é hospedado no projeto Supabase do usuário
+# ==============================================================================
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.frontend
+    image: pricehunter-frontend:latest
+    container_name: pricehunter-frontend
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-8080}:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pricehunter-network
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
+    image: pricehunter-backend:latest
+    container_name: pricehunter-backend
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-8000}:8000"
+    env_file:
+      - .env
+    networks:
+      - pricehunter-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/system/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 15s
+
+  worker:
+    build:
+      context: .
+      dockerfile: Dockerfile.worker
+    image: pricehunter-worker:latest
+    container_name: pricehunter-worker
+    restart: unless-stopped
+    env_file:
+      - .env
+    depends_on:
+      backend:
+        condition: service_healthy
+    networks:
+      - pricehunter-network
+
+  redis:
+    image: redis:7.2-alpine
+    container_name: pricehunter-redis
+    restart: unless-stopped
+    command: redis-server --appendonly yes --requirepass "${REDIS_PASSWORD:-pricehunter_redis_secret}"
+    volumes:
+      - redis_data:/data
+    networks:
+      - pricehunter-network
+
+volumes:
+  redis_data:
+    name: pricehunter_redis_data
+    driver: local
+
+networks:
+  pricehunter-network:
+    name: pricehunter-network
+    driver: bridge

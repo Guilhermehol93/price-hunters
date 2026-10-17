@@ -1,0 +1,55 @@
+# ==============================================================================
+# Dockerfile Backend API - Price Hunter
+# Multi-stage, non-root user, optimized production container
+# ==============================================================================
+
+# Stage 1: Build & Dependencies
+FROM python:3.11-slim-bookworm AS builder
+
+WORKDIR /build
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    build-essential \
+    libpq-dev \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY requirements.txt .
+RUN pip install --no-cache-dir --user -r requirements.txt
+
+# Stage 2: Final Runtime
+FROM python:3.11-slim-bookworm AS runtime
+
+WORKDIR /app
+
+# Instalar bibliotecas de runtime necessárias e curl para health check
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    libpq5 \
+    curl \
+    && rm -rf /var/lib/apt/lists/*
+
+# Criar usuário sem privilégios (non-root) para segurança reforçada
+RUN groupadd -g 10001 appgroup && \
+    useradd -u 10001 -g appgroup -s /bin/bash -m appuser
+
+# Copiar dependências do estágio de build
+COPY --from=builder /root/.local /home/appuser/.local
+ENV PATH=/home/appuser/.local/bin:$PATH
+ENV PYTHONUNBUFFERED=1
+ENV PYTHONDONTWRITEBYTECODE=1
+
+# Copiar código-fonte da aplicação
+COPY --chown=appuser:appgroup app /app/app
+COPY --chown=appuser:appgroup frontend /app/frontend
+COPY --chown=appuser:appgroup database /app/database
+COPY --chown=appuser:appgroup scripts /app/scripts
+COPY --chown=appuser:appgroup supabase /app/supabase
+
+USER appuser
+
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
+    CMD curl -f http://localhost:8000/api/system/health || exit 1
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
