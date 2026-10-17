@@ -47,6 +47,7 @@ services:
       - TELEGRAM_DEFAULT_CHAT_ID=${TELEGRAM_DEFAULT_CHAT_ID:-}
       - TELEGRAM_ALERT_COOLDOWN_HOURS=${TELEGRAM_ALERT_COOLDOWN_HOURS:-24}
       - TELEGRAM_ENABLED=${TELEGRAM_ENABLED:-true}
+      - REEFAPI_API_KEY=${REEFAPI_API_KEY:-}
     networks:
       - pricehunter-network
     healthcheck:

@@ -29,6 +29,10 @@ O projeto inclui um documento HTML **100% autossuficiente, responsivo e em portu
 
 ## ⚡ Início Rápido
 
+### Histórico de preços de eletrônicos
+
+O Radar pode comparar smartphones, informática e outros eletrônicos com o histórico diário do Zoom/Buscapé, consultado via ReefAPI (até 12 meses). Para habilitar, cadastre uma chave ReefAPI e defina `REEFAPI_API_KEY` nas variáveis de ambiente usadas pelo Docker Compose. A API anuncia 1.000 créditos iniciais gratuitos; chamadas posteriores dependem do plano e consomem créditos. Sem essa chave, a busca nos sites continua disponível e usa o preço original publicado pela loja quando houver.
+
 ### 1. Configuração de Variáveis de Ambiente
 Copie o template de exemplo:
 ```bash

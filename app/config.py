@@ -57,6 +57,9 @@ class Settings(BaseSettings):
     OPPORTUNITY_SCORE_MIN_THRESHOLD: int = 70
     DEFAULT_DISCOUNT_THRESHOLD_PCT: float = 15.0
 
+    # Histórico de preços brasileiro (Zoom/Buscapé via ReefAPI)
+    REEFAPI_API_KEY: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",

@@ -111,6 +111,53 @@
 
             <!-- View: Radar de Ofertas -->
             <section id="tab-radar" class="tab-pane active">
+                <section class="market-search-card" aria-labelledby="market-search-title">
+                    <div class="market-search-heading">
+                        <div>
+                            <span class="section-eyebrow">BUSCA PERSONALIZADA</span>
+                            <h3 id="market-search-title">Encontre ofertas em vários sites</h3>
+                            <p>Escolha uma categoria, informe o que procura e defina o desconto mínimo.</p>
+                        </div>
+                    </div>
+                    <form id="radar-search-form">
+                        <div class="market-search-fields">
+                            <div class="form-group">
+                                <label for="radar-category">Categoria</label>
+                                <select id="radar-category" required>
+                                    <option value="">Carregando categorias…</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="radar-query">Produto ou termos</label>
+                                <input id="radar-query" type="text" minlength="2" maxlength="200" placeholder="Ex.: café em cápsulas, notebook gamer" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="radar-min-discount">Desconto mínimo (%)</label>
+                                <input id="radar-min-discount" type="number" min="0" max="100" step="0.5" value="15" required>
+                            </div>
+                        </div>
+                        <div class="market-search-fields market-search-secondary">
+                            <div class="form-group market-sites-field">
+                                <label for="radar-sites">Sites para pesquisar</label>
+                                <textarea id="radar-sites" rows="3" required>https://www.mercadolivre.com.br
+https://www.amazon.com.br
+https://www.zoom.com.br</textarea>
+                                <small>Um domínio ou URL de busca por linha, até 8 sites. Para sites personalizados, a busca usa parâmetros comuns como q= ou k=.</small>
+                            </div>
+                            <div class="form-group">
+                                <label>Comparativo de mercado</label>
+                                <p class="form-help">Busca pelo nome no Zoom/Buscapé e compara com até 12 meses de histórico.</p>
+                            </div>
+                        </div>
+                        <div class="market-search-actions">
+                            <p>Histórico brasileiro de eletrônicos: <a href="https://www.zoom.com.br/" target="_blank" rel="noopener noreferrer">Zoom / Buscapé via ReefAPI</a>. Requer <code>REEFAPI_API_KEY</code>; a API oferece 1.000 créditos iniciais gratuitos.</p>
+                            <button class="btn btn-primary" id="btn-run-radar-search" type="submit">🔎 Buscar ofertas</button>
+                        </div>
+                    </form>
+                    <div id="radar-search-status" class="radar-search-status" aria-live="polite"></div>
+                    <div class="deals-grid custom-deals-grid" id="radar-custom-results"></div>
+                </section>
+
                 <div class="filter-bar">
                     <div class="filter-group">
                         <label>Score Mínimo:</label>

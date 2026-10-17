@@ -6,11 +6,104 @@ document.addEventListener("DOMContentLoaded", () => {
     initThemeToggle();
     initNavigation();
     initModals();
+    initRadarSearch();
     loadDashboardMetrics();
     loadRadarDeals();
     loadSystemHealth();
     initTelegramSettings();
 });
+
+function initRadarSearch() {
+    const categorySelect = document.getElementById("radar-category");
+    const form = document.getElementById("radar-search-form");
+
+    fetch("/api/products/categories")
+        .then(async res => {
+            if (!res.ok) throw new Error(await extractErrorMessage(res));
+            return res.json();
+        })
+        .then(categories => {
+            categorySelect.innerHTML = '<option value="">Selecione uma categoria</option>' +
+                categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join("") +
+                '<option value="Geral">Geral / outra</option>';
+        })
+        .catch(() => {
+            categorySelect.innerHTML = '<option value="Geral">Geral / outra</option>';
+        });
+
+    form.addEventListener("submit", async event => {
+        event.preventDefault();
+        const status = document.getElementById("radar-search-status");
+        const resultsContainer = document.getElementById("radar-custom-results");
+        const button = document.getElementById("btn-run-radar-search");
+        const sites = document.getElementById("radar-sites").value.split(/\r?\n/).map(site => site.trim()).filter(Boolean);
+        const payload = {
+            category: categorySelect.value,
+            query: document.getElementById("radar-query").value.trim(),
+            min_discount_pct: Number(document.getElementById("radar-min-discount").value),
+            use_market_history: true,
+            sites,
+        };
+        if (!payload.category) {
+            status.textContent = "Selecione uma categoria.";
+            return;
+        }
+        if (sites.length > 8) {
+            status.textContent = "Informe no máximo 8 sites.";
+            return;
+        }
+
+        button.disabled = true;
+        button.textContent = "Pesquisando…";
+        status.textContent = "Consultando os sites e comparando os preços disponíveis…";
+        resultsContainer.innerHTML = "";
+        try {
+            const res = await fetch("/api/radar/search", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload),
+            });
+            if (!res.ok) throw new Error(await extractErrorMessage(res, "Falha na busca personalizada"));
+            const data = await parseApiJson(res, "A busca personalizada do Radar");
+            const offers = data.results || [];
+            const warnings = (data.site_errors || []).map(item => `${escapeHtml(item.site)}: ${escapeHtml(item.error)}`);
+
+            if (data.market_reference) {
+                status.innerHTML = `Referência ${escapeHtml(data.market_reference.source)}: média de ${formatCurrency(data.market_reference.average_price)} em ${data.market_reference.observations} pontos históricos. Produto: ${escapeHtml(data.market_reference.product_title)}. <a href="${escapeHtml(data.market_reference.source_url)}" target="_blank" rel="noopener noreferrer">Abrir fonte</a>.`;
+            } else if (!data.market_history_configured) {
+                status.textContent = "Configure REEFAPI_API_KEY no ambiente da API para habilitar o histórico do Zoom/Buscapé; a busca também avalia preços originais informados pelas lojas.";
+            } else {
+                status.textContent = "Não foi encontrado histórico correspondente para este produto. A busca ainda avalia preços originais informados pelas lojas.";
+            }
+            if (warnings.length) status.innerHTML += `<div class="search-warnings">Sites sem resultado: ${warnings.join(" · ")}</div>`;
+
+            if (!offers.length) {
+                resultsContainer.innerHTML = '<div class="search-empty">Nenhuma oferta com referência de preço e desconto acima do limite foi encontrada.</div>';
+                return;
+            }
+            resultsContainer.innerHTML = offers.map(offer => `
+                <article class="deal-card">
+                    <div class="deal-card-header"><span class="discount-tag">-${Number(offer.discount_pct).toFixed(1)}%</span><span class="store-badge">${escapeHtml(offer.store)}</span></div>
+                    <h3 class="deal-title">${escapeHtml(offer.title)}</h3>
+                    <div class="price-box">
+                        <div><span class="price-current">${formatCurrency(offer.current_price)}</span><span class="price-original">${formatCurrency(offer.reference_price)}</span></div>
+                        <span class="discount-tag">Referência: ${escapeHtml(offer.reference_source)}</span>
+                    </div>
+                    <div class="deal-card-footer"><span class="store-badge">${escapeHtml(offer.category)}</span><a class="btn-visit" href="${escapeHtml(offer.url)}" target="_blank" rel="noopener noreferrer">Ver oferta ↗</a></div>
+                </article>
+            `).join("");
+        } catch (err) {
+            status.textContent = err.message || "Não foi possível concluir a busca.";
+        } finally {
+            button.disabled = false;
+            button.textContent = "🔎 Buscar ofertas";
+        }
+    });
+}
+
+function formatCurrency(value) {
+    return Number(value).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
 
 // ----------------------------------------------------------------------------
 // Tema claro/escuro
@@ -175,12 +268,28 @@ async function loadSystemHealth() {
 // Helper de Tratamento de Erros da API
 // ----------------------------------------------------------------------------
 async function extractErrorMessage(res, defaultMsg = "Erro na requisição") {
+    let rawBody = "";
     try {
-        const data = await res.json();
+        rawBody = await res.text();
+        const data = JSON.parse(rawBody);
         if (data.detail) return typeof data.detail === "string" ? data.detail : JSON.stringify(data.detail);
         if (data.message) return data.message;
     } catch {}
+    if (rawBody.trim()) {
+        const bodyPreview = rawBody.trim().replace(/\s+/g, " ").slice(0, 240);
+        return `A API respondeu HTTP ${res.status} com uma mensagem não JSON: ${bodyPreview}`;
+    }
     return `HTTP ${res.status}: ${res.statusText || defaultMsg}`;
+}
+
+async function parseApiJson(res, endpointName) {
+    const rawBody = await res.text();
+    try {
+        return JSON.parse(rawBody);
+    } catch {
+        const bodyPreview = rawBody.trim().replace(/\s+/g, " ").slice(0, 240);
+        throw new Error(`${endpointName} retornou conteúdo inválido (HTTP ${res.status}): ${bodyPreview || "resposta vazia"}`);
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -206,11 +315,15 @@ async function loadRadarDeals() {
             const errorMsg = await extractErrorMessage(res, "Falha ao consultar radar");
             throw new Error(errorMsg);
         }
-        const deals = await res.json();
+        const deals = await parseApiJson(res, "A API interna do Radar");
+
+        if (!Array.isArray(deals)) {
+            throw new Error("A API interna do Radar retornou um formato inesperado. Esperava uma lista de ofertas.");
+        }
 
         document.getElementById("metric-radar-count").textContent = deals.length;
 
-        if (!Array.isArray(deals) || deals.length === 0) {
+        if (deals.length === 0) {
             container.innerHTML = `
                 <div style="grid-column: 1/-1; text-align: center; color: var(--text-muted); padding: 40px;">
                     Nenhuma oferta encontrada para os filtros selecionados. Tente reduzir o score mínimo.

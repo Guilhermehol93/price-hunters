@@ -3,6 +3,7 @@
 from uuid import UUID
 from typing import Optional
 from fastapi import APIRouter, Depends, HTTPException, Query
+from sqlalchemy import distinct, select
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.repositories.product_repo import ProductRepository
@@ -14,6 +15,16 @@ import logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/products", tags=["Produtos"])
+
+
+@router.get("/categories", response_model=list[str])
+def list_product_categories(db: Session = Depends(get_db)):
+    try:
+        stmt = select(distinct(Product.category)).where(Product.category.is_not(None)).order_by(Product.category)
+        return [category for category in db.scalars(stmt).all() if category and category.strip()]
+    except Exception as e:
+        logger.error("Erro ao listar categorias de produtos: %s", e, exc_info=True)
+        raise HTTPException(status_code=503, detail="Não foi possível carregar as categorias do catálogo.")
 
 
 @router.get("", response_model=list[ProductResponse])

@@ -60,6 +60,26 @@ button { cursor: pointer; }
 .metric-label { display: block; color: var(--muted); font-size: 11px; line-height: 1.35; }
 .metric-value { display: block; margin-top: 4px; color: var(--ink); font: 800 25px 'Manrope', sans-serif; letter-spacing: -.7px; }
 
+.market-search-card { margin-bottom: 20px; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); box-shadow: var(--shadow); }
+.market-search-heading { display: flex; justify-content: space-between; margin-bottom: 17px; }
+.section-eyebrow { color: var(--green); font-size: 9px; font-weight: 800; letter-spacing: .13em; }
+.market-search-heading h3 { margin: 5px 0 4px; font: 800 18px 'Manrope', sans-serif; }
+.market-search-heading p { margin: 0; color: var(--muted); font-size: 12px; }
+.market-search-fields { display: grid; grid-template-columns: 1fr 1.5fr 170px; gap: 13px; }
+.market-search-fields .form-group { margin-bottom: 10px; }
+.market-search-fields .form-group label { color: #53645b; }
+.market-search-fields .form-group input, .market-search-fields .form-group select, .market-search-fields textarea { width: 100%; min-height: 40px; padding: 9px 11px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--surface-soft); font-size: 12px; }
+.market-search-fields textarea { resize: vertical; line-height: 1.5; }
+.market-search-fields small { display: block; margin-top: 6px; color: var(--muted); font-size: 10px; line-height: 1.45; }
+.market-search-secondary { grid-template-columns: 1.5fr 1fr; }
+.market-search-actions { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding-top: 2px; }
+.market-search-actions p { margin: 0; color: var(--muted); font-size: 10px; }
+.market-search-actions a, .radar-search-status a { color: var(--green); font-weight: 700; }
+.radar-search-status { margin-top: 13px; color: var(--muted); font-size: 11px; line-height: 1.6; }
+.search-warnings { margin-top: 5px; color: var(--amber); }
+.custom-deals-grid { margin-top: 12px; }
+.search-empty { grid-column: 1 / -1; padding: 20px; border: 1px dashed var(--line); border-radius: 12px; color: var(--muted); background: var(--surface-soft); text-align: center; font-size: 12px; }
+
 .filter-bar { display: flex; align-items: center; flex-wrap: wrap; gap: 12px 22px; margin-bottom: 18px; padding: 14px 17px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); }
 .filter-group { display: flex; align-items: center; gap: 9px; color: var(--muted); font-size: 11px; font-weight: 600; }
 .filter-group select, .filter-group input { min-height: 36px; padding: 0 30px 0 10px; border: 1px solid var(--line); border-radius: 8px; outline: none; color: #34453d; background: #fbfcfb; font-size: 12px; }
@@ -156,6 +176,7 @@ select:focus, input:focus { border-color: #71b99a !important; box-shadow: 0 0 0 
 :root[data-theme="dark"] .alert-info { border-color: #314b5c; color: #b1d4ed; background: #1b2b35; }
 :root[data-theme="dark"] .btn-close { color: #bac8bf; background: #26352d; }
 :root[data-theme="dark"] .modal-backdrop { background: rgba(0, 0, 0, .72); }
+:root[data-theme="dark"] .market-search-fields .form-group label { color: #bdc9c1; }
 .theme-toggle { min-width: 124px; }
 .theme-toggle-icon { font-size: 14px; }
 
@@ -178,6 +199,7 @@ select:focus, input:focus { border-color: #71b99a !important; box-shadow: 0 0 0 
     .sidebar { width: 220px; flex-basis: 220px; }
     .main-content { width: calc(100% - 220px); padding-inline: 26px; }
     .metrics-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .market-search-fields { grid-template-columns: 1fr 1fr; }
 }
 @media (max-width: 720px) {
     .app-container { display: block; }
@@ -204,6 +226,9 @@ select:focus, input:focus { border-color: #71b99a !important; box-shadow: 0 0 0 
     .filter-group { align-items: flex-start; flex-direction: column; gap: 5px; flex: 1 1 42%; }
     .filter-group select { width: 100%; padding-right: 8px; }
     .deals-grid { grid-template-columns: 1fr; }
+    .market-search-card { padding: 16px; }
+    .market-search-fields, .market-search-secondary { grid-template-columns: 1fr; gap: 0; }
+    .market-search-actions { align-items: stretch; flex-direction: column; }
     .form-row { grid-template-columns: 1fr; gap: 0; }
     .settings-card { padding: 19px; }
     .data-table { min-width: 650px; }
